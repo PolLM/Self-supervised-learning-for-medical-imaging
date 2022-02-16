@@ -62,10 +62,14 @@ optimizer = torch.optim.Adam(learner.parameters(), lr=0.001)
 
 #Single training epoch
 loss_list = []
+
 for batch_idx, ((x1,x2), _) in enumerate(tqdm(loader)):
-    plt.imshow(torch.movedim(x1[100], 0, 2))
-    plt.show()
-    a=p
+    if batch_idx == 0:
+        plt.imshow(torch.movedim(x1[0], 0, 2), origin='lower')
+        plt.show()
+        plt.imshow(torch.movedim(x2[0], 0, 2), origin='lower')
+        plt.show()
+
     x1, x2 = x1.to(device), x2.to(device)
     loss = learner(x1, x2)
     optimizer.zero_grad()
