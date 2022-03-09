@@ -28,14 +28,14 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 BATCH_SIZE_LIST = [2**5, 2**6, 2**7, 2**8, 2**9, 2**10, 2**11]
 OUTPUT_DIM = 4
 IMG_DIM_LIST = [
-                #(32,32), (64, 64), (128, 128), (256, 256), (512, 512), (1024, 1024),
+                (32,32), (64, 64), (128, 128), (256, 256), (512, 512), (1024, 1024),
                 (32,32), (64, 64), (128, 128), (256, 256), (512, 512), (1024, 1024),
                 (32,32), (64, 64), (128, 128), (256, 256), (512, 512), (1024, 1024),
                 (32,32), (64, 64), (128, 128), (256, 256), (512, 512), (1024, 1024),
                 #(256, 224),(256, 240),(288, 288),(320, 300),(384, 380),
                 ]
 MODEL = [
-        #"Resnet18", "Resnet18", "Resnet18", "Resnet18", "Resnet18", "Resnet18", 
+        "Resnet18", "Resnet18", "Resnet18", "Resnet18", "Resnet18", "Resnet18", 
         "Resnet34", "Resnet34", "Resnet34", "Resnet34", "Resnet34", "Resnet34", 
         "Resnet50", "Resnet50", "Resnet50", "Resnet50", "Resnet50", "Resnet50",
         "Resnet101", "Resnet101", "Resnet101", "Resnet101", "Resnet101", "Resnet101",
@@ -119,12 +119,7 @@ for CH in IN_CHAN:
                     model.features[0][0] = nn.Conv2d(1, 48, 3, 2, 1, bias=False)####CH1   
 
             print(f"----> CHANNELS: {CH}, BATCH_SIZE: {BATCH_SIZE}, IMG_DIM: {IMG_DIM_H}, {IMG_DIM_W} ")
-            #This is just any generic model
 
-            #Optional: define transformations for your specific dataset.
-            #Generally, it is best to use the original augmentations in the
-            #paper, replacing the Imagenet normalization with the normalization
-            #for your dataset.
 
             if CH == "CH1":
                 transform = transforms.Compose([
