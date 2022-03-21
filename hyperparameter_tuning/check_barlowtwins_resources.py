@@ -5,9 +5,12 @@ import os
 import numpy as np
 import time
 
+import sys 
+PROJECT_PATH =  os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+sys.path.insert(0,PROJECT_PATH)
 
-os.environ['KMP_DUPLICATE_LIB_OK']='True'
-ssl._create_default_https_context = ssl._create_unverified_context
+#os.environ['KMP_DUPLICATE_LIB_OK']='True'
+#ssl._create_default_https_context = ssl._create_unverified_context
 
 from torchvision import transforms
 from self_sup_classes.barlow import *
@@ -22,7 +25,6 @@ from torchvision.datasets import ImageFolder
 from tqdm import tqdm
 import matplotlib.pylab as plt
 import json
-
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 BATCH_SIZE_LIST = [2**5, 2**6, 2**7, 2**8, 2**9, 2**10, 2**11]
@@ -43,7 +45,7 @@ MODEL = [
         ]
 
 IN_CHAN = ["CH3"]
-with open('runs/barlowtwins/scan_model_times.txt', 'a') as f:
+with open(PROJECT_PATH + '/runs/time_execution/scan_model_times.txt', 'a') as f:
     f.write("============Scanning running times============\n")
     f.write("Model InputChannel Batch Height Width Time\n")
 for CH in IN_CHAN:
@@ -185,5 +187,7 @@ for CH in IN_CHAN:
                     f.write(f"{M} {CH} {BATCH_SIZE} {IMG_DIM_H} {IMG_DIM_W} OOM\n")
         #with open(f'runs/barlowtwins/scan_{M}_inChan{CH}_batch{BATCH_SIZE}_res_{IMG_DIM_H}_{IMG_DIM_W}.json', 'w') as fp:
         #    json.dump(time_for_epoch, fp)           
+
+Ç# %%
 
 # %%

@@ -1,7 +1,7 @@
 #%%
 import torch
 import torch.nn as nn
-from torchsummary import summary
+from torchvision import models
 
 '''
 Implementation of Barlow Twins (https://arxiv.org/abs/2103.03230), adapted from (https://github.com/MaxLikesMath/Barlow-Twins-Pytorch) 
@@ -58,17 +58,8 @@ class NetWrapper(nn.Module):
 
         return representation
 
-class BackBone():
-    def __init__(self):
-        pass
-    
-    def initialize_model(self, )
 
-def off_diagonal(x):
-    # return a flattened view of the off-diagonal elements of a square matrix
-    n, m = x.shape
-    assert n == m
-    return x.flatten()[:-1].view(n - 1, n + 1)[:, 1:].flatten()
+
 
 
 class BarlowTwins(nn.Module):
@@ -110,8 +101,6 @@ class BarlowTwins(nn.Module):
             model.features[0][0] = nn.Conv2d(1, 40, 3, 2, 1, bias=False)
         elif self.monochanel and "b4" in self.backbone_name.lower():
             model.features[0][0] = nn.Conv2d(1, 48, 3, 2, 1, bias=False)
-
-        #Replacing layers that are 
         
         #Removing the backbone layers until latent id
         if self.latent_id:
@@ -122,7 +111,7 @@ class BarlowTwins(nn.Module):
             print(self.backbone)
             print(30*"="+"\n")
 
-    def add_projector(self,  , verbose = False):
+    def add_projector(self,  projector_sizes, verbose = False):
         '''
         :param projector: size of the hidden layers in the projection MLP
         '''
@@ -141,7 +130,12 @@ class BarlowTwins(nn.Module):
             print("\n"+10*"="+"Projector"+10*"=")
             print(self.projector)
             print(30*"="+"\n")
-            
+
+    def _off_diagonal(self, x):
+        # return a flattened view of the off-diagonal elements of a square matrix
+        n, m = x.shape
+        assert n == m
+        return x.flatten()[:-1].view(n - 1, n + 1)[:, 1:].flatten()        
 
     def barlow_loss(self, z1, z2):
         # empirical cross-correlation matrix
@@ -150,7 +144,7 @@ class BarlowTwins(nn.Module):
         # use --scale-loss to multiply the loss by a constant factor
         # see the Issues section of the readme
         on_diag = torch.diagonal(c).add_(-1).pow_(2).sum()
-        off_diag = off_diagonal(c).pow_(2).sum()
+        off_diag = self._off_diagonal(c).pow_(2).sum()
         loss = self.scale_factor*(on_diag + self.lambd * off_diag)
         return(loss, on_diag, off_diag)
 
@@ -173,15 +167,16 @@ if __name__=='__main__':
     import torchvision
 
     model = torchvision.models.resnet18(zero_init_residual=True)
+    model = models.efficientnet_b1(pretrained=False, zero_init_residual=True)
     twins = BarlowTwins(0.5)
     twins.add_backbone( 
                         backbone =model, 
                         latent_id = -2,#"layer4", 
                         monochanel = True, 
-                        backbone_name='Resnet18', 
+                        backbone_name='B1', 
                         verbose=True)
     twins.add_projector(
-                        projector_sizes = [512, 512, 512, 512], 
+                        projector_sizes = [ ], 
                         verbose = True)
 
     inp1 = torch.rand(5,1,512,512)
