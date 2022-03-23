@@ -9,8 +9,8 @@ import sys
 PROJECT_PATH =  os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 sys.path.insert(0,PROJECT_PATH)
 
-#os.environ['KMP_DUPLICATE_LIB_OK']='True'
-#ssl._create_default_https_context = ssl._create_unverified_context
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+ssl._create_default_https_context = ssl._create_unverified_context
 
 from torchvision import transforms
 from self_sup_classes.barlow import *
@@ -188,6 +188,6 @@ for CH in IN_CHAN:
         #with open(f'runs/barlowtwins/scan_{M}_inChan{CH}_batch{BATCH_SIZE}_res_{IMG_DIM_H}_{IMG_DIM_W}.json', 'w') as fp:
         #    json.dump(time_for_epoch, fp)           
 
-Ç# %%
+# %%
 
 # %%

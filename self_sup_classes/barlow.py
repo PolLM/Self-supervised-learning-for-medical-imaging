@@ -94,13 +94,13 @@ class BarlowTwins(nn.Module):
 
         #Converting the input channels from 3 to 1
         if self.monochanel and "resnet" in self.backbone_name.lower():
-            model.conv1 = nn.Conv2d(1, 64, 7, 2, 3, bias=False)
+            self.backbone.conv1 = nn.Conv2d(1, 64, 7, 2, 3, bias=False)
         elif self.monochanel and  any(ext in self.backbone_name.lower() for ext in ["b0", "b1", "b2"]):
-            model.features[0][0] = nn.Conv2d(1, 32, 3, 2, 1, bias=False)
+            self.backbone.features[0][0] = nn.Conv2d(1, 32, 3, 2, 1, bias=False)
         elif self.monochanel and "b3" in self.backbone_name.lower():
-            model.features[0][0] = nn.Conv2d(1, 40, 3, 2, 1, bias=False)
+            self.backbone.features[0][0] = nn.Conv2d(1, 40, 3, 2, 1, bias=False)
         elif self.monochanel and "b4" in self.backbone_name.lower():
-            model.features[0][0] = nn.Conv2d(1, 48, 3, 2, 1, bias=False)
+            self.backbone.features[0][0] = nn.Conv2d(1, 48, 3, 2, 1, bias=False)
         
         #Removing the backbone layers until latent id
         if self.latent_id:
@@ -152,11 +152,9 @@ class BarlowTwins(nn.Module):
         #Forward through the backbone
         z1 = self.backbone(y1)
         z2 = self.backbone(y2)
-        print(z1.shape, z2.shape)
         #Forward through the projector
         z1 = self.projector(z1)
         z2 = self.projector(z2)
-        print(z1.shape, z2.shape)
         #Computing the loss from the latent vectors
         loss, on_diag, off_diag = self.barlow_loss(z1, z2)
 
