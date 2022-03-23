@@ -26,6 +26,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 torch.cuda.empty_cache( )
 config = {
     "mode": 'scan_scheduler',
+    "random_seed": 73,
     "num_epochs": 10,
     "batch_size": 128,
     "device": torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu"),
@@ -53,6 +54,7 @@ if config["mode"] == 'scan_lr':
     This code is used to scan the optimal lr to train the Barlow Twins model. 
     Learnings: From the optimal lr range, We will start with the highest lr value,
     we will set this value to as the starting lr value for our trainings.
+
     Observations: We have found this lr value to be, approx lr: 2e-3
     '''                              
     back_model = torchvision.models.resnet18(zero_init_residual=True)
@@ -88,8 +90,12 @@ elif config["mode"] == 'scan_scheduler':
     - constant lr
     - multiplicative lr
     - cosine annealing lr
-    '''
 
+    Fixing seed every iteration since the random initialization can be
+    an important factor, and we want to factor it out: https://arxiv.org/abs/2109.08203
+
+    Observations: For our combinations, cosine similarity give the best results
+    '''
 
     back_model = torchvision.models.resnet18(zero_init_residual=True)
     model = BarlowTwins(config["barlow_lambda"])
@@ -102,24 +108,21 @@ elif config["mode"] == 'scan_scheduler':
 
     model.add_projector(
                         projector_sizes = [512, 512, 512, 512], 
-                        verbose = False)                    
+                        verbose = False)      
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"], weight_decay=config["optimizer_weight_decay"])
+    schedulers_list = ['None', 'Multiplicative', 'Cosine']
 
-    scheduler_list = [
-        torch.optim.lr_scheduler.MultiplicativeLR(optimizer, lr_lambda=lambda epoch: 0.64, last_epoch=- 1, verbose=True),
-        torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=config["num_epochs"], verbose=True),
-        None,
-        ]
 
 
 
     sched_losses = defaultdict(list)
-    for i, scheduler in enumerate(scheduler_list):
+    for sched_name in schedulers_list:
+        
+        print("Training with scheduler: " + str(sched_name))
 
-        print("Training with scheduler: " + str(scheduler))
-
+        torch.manual_seed(config["random_seed"])
         torch.cuda.empty_cache( )
+
         back_model = torchvision.models.resnet18(zero_init_residual=True)
         model = BarlowTwins(config["barlow_lambda"])
         model.add_backbone( 
@@ -134,6 +137,15 @@ elif config["mode"] == 'scan_scheduler':
                             verbose = False)                    
 
         optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"], weight_decay=config["optimizer_weight_decay"])
+
+        
+        if sched_name == 'None':
+            scheduler = None
+        elif sched_name == 'Multiplicative':
+            scheduler = torch.optim.lr_scheduler.MultiplicativeLR(optimizer, lr_lambda=lambda epoch: 0.64, last_epoch=- 1, verbose=True)
+        elif sched_name == 'Cosine':
+            scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=config["num_epochs"], verbose=True)
+
         for epoch in range(config["num_epochs"]):
             
             losses = train_one_epoch(loader, model, optimizer, config)
@@ -143,16 +155,10 @@ elif config["mode"] == 'scan_scheduler':
             sched_losses[str(scheduler)] += losses
             print(f"---> Avg epoch loss: {np.mean(losses)}" )
 
+        torch.save(torch.tensor(sched_losses[str(scheduler)]), str(scheduler)+"_scan_loss.pt")
+
         plt.plot(range(len(sched_losses[str(scheduler)])), sched_losses[str(scheduler)])
-        plt.savefig(f"{i}_sched_losses.png")
-        plt.show()
+        plt.savefig(f"{sched_name}_sched_losses.png")
 
-    with open('scheduler_losses.json', 'w') as fp:
-        json.dump(sched_losses, fp)
-
-    for k,v in sched_losses.items():
-        plt.plot(range(v), v)
-        plt.savefig(f"{k}_sched_losses.png")
-        plt.show()
 
 # %%
