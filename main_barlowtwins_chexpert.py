@@ -47,12 +47,24 @@ transform = transforms.Compose([
 #For the transform argument for the dataset, pass in 
 # Twins.transform_utils.Transform(transform_1, transform_2)
 #If transforms are None, the Imagenet default is used.
-#dataset = dsets.CIFAR10("datasets", train=True, transform=Transform(transform, transform), download=True)
-dataset = CheXpertDataset("data/Frontal_Train.csv","data/CheXpertResized", transform=Transform(transform, transform))
+dataset = CheXpertDataset("data/Frontal_Train.csv","data/resized", transform=Transform(transform, transform))
+dataset_test, dataset_train = split_dataset(dataset)
 
-loader = torch.utils.data.DataLoader(dataset,
+#We only have test and validation datasets.
+#Since train test is big enough, it will split in two: test and train.
+
+dataset_valid = CheXpertDataset("data/Frontal_valid.csv","data/resized")
+
+loader_train = torch.utils.data.DataLoader(dataset_train,
                                         batch_size=BATCH_SIZE,
                                         shuffle=True)
+loader_valid = torch.utils.data.DataLoader(dataset_valid,
+                                        batch_size=BATCH_SIZE,
+                                        shuffle=True)
+loader_test =  torch.utils.data.DataLoader(dataset_test,
+                                        batch_size=BATCH_SIZE,
+                                        shuffle=True)
+
 #Make the BT instance, passing the model, the latent rep layer id,
 # hidden units for the projection MLP, the tradeoff factor,
 # and the loss scale.
@@ -67,7 +79,7 @@ loss_list = []
 start = 0
 start = time.time()
 
-for batch_idx, ((x1,x2), _) in enumerate(loader):
+for batch_idx, ((x1,x2), _) in enumerate(loader_train):
   #if batch_idx == 0:
   #    plt.imshow(torch.movedim(data[0][0], 0, 2), origin='lower')
   #    plt.show()
