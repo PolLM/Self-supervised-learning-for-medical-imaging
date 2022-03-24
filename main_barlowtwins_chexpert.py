@@ -47,13 +47,9 @@ transform = transforms.Compose([
 #For the transform argument for the dataset, pass in 
 # Twins.transform_utils.Transform(transform_1, transform_2)
 #If transforms are None, the Imagenet default is used.
-dataset = CheXpertDataset("data/Frontal_Train.csv","data/resized", transform=Transform(transform, transform))
-dataset_test, dataset_train = split_dataset(dataset)
-
-#We only have test and validation datasets.
-#Since train test is big enough, it will split in two: test and train.
-
 dataset_valid = CheXpertDataset("data/Frontal_valid.csv","data/resized")
+dataset_test = CheXpertDataset("data/Frontal_Train.csv","data/resized")
+dataset_train = CheXpertDataset("data/Frontal_Train.csv","data/resized", transform=Transform(transform, transform))
 
 loader_train = torch.utils.data.DataLoader(dataset_train,
                                         batch_size=BATCH_SIZE,
@@ -98,6 +94,7 @@ for batch_idx, ((x1,x2), _) in enumerate(loader_train):
     print("End Batch "+str(batch_idx))
     print("Elapsed time: "+str(time.time() - start))
     start = time.time()
+
 
 plt.plot(loss_list)
 plt.show()
