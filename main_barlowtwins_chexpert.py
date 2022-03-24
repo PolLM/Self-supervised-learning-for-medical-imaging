@@ -48,7 +48,7 @@ transform = transforms.Compose([
 # Twins.transform_utils.Transform(transform_1, transform_2)
 #If transforms are None, the Imagenet default is used.
 #dataset = dsets.CIFAR10("datasets", train=True, transform=Transform(transform, transform), download=True)
-dataset = CheXpertDataset("data/Frontal_Train.csv","resized", transform=Transform(transform, transform))
+dataset = CheXpertDataset("data/Frontal_Train.csv","data/CheXpertResized", transform=Transform(transform, transform))
 
 loader = torch.utils.data.DataLoader(dataset,
                                         batch_size=BATCH_SIZE,
