@@ -128,3 +128,7 @@ def scan_best_lr(data_loader, model, optimizer, config, criterion=False,  return
         optimizer.step()
         loss_history.append(loss.item()/batch_s)
     return(lr_range, loss_history)
+
+def split_dataset(dataset):
+    SIZE_TEST = 500
+    return torch.utils.data.random_split(dataset,[SIZE_TEST,dataset.__len__()-SIZE_TEST], generator=torch.Generator().manual_seed(42))
