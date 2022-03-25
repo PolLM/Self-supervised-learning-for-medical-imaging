@@ -128,3 +128,11 @@ def scan_best_lr(data_loader, model, optimizer, config, criterion=False,  return
         optimizer.step()
         loss_history.append(loss.item()/batch_s)
     return(lr_range, loss_history)
+
+def split_dataset():
+    xray=pd.read_csv('data/Frontal_Train.csv')
+    test = xray.sample(n=500)
+    train = xray.drop(test.index)
+
+    test.to_csv("test.csv",index=False)
+    train.to_csv("train.csv",index=False)
