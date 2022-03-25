@@ -1,14 +1,30 @@
 import os
 import shutil
-
+import json
 import torch
 import yaml
+import pickle
+
+#code from: https://stackoverflow.com/questions/7100125/storing-python-dictionaries
+def save_dict_to_pickle(state, basepath = os.getcwd(), filename='config.p'):
+    if not os.path.exists(basepath):
+        os.makedirs(basepath)
+    savepath = os.path.join(basepath, filename)
+    with open(savepath, 'wb') as fp:
+        pickle.dump(state, fp, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
-    torch.save(state, filename)
-    if is_best:
-        shutil.copyfile(filename, 'model_best.pth.tar')
+def save_dict_to_json(state, basepath = os.getcwd(), filename='config.json'):
+    if not os.path.exists(basepath):
+        os.makedirs(basepath)
+    savepath = os.path.join(basepath, filename)
+    with open(savepath, 'w') as fp:
+        json.dump(state, fp)
+
+def save_checkpoint(state, basepath = os.getcwd(), filename='checkpoint.pt'):
+    if not os.path.exists(basepath):
+        os.makedirs(basepath)
+    torch.save(state, os.path.join(basepath, filename))
 
 
 def save_config_file(model_checkpoints_folder, args):

@@ -1,4 +1,5 @@
 #%%
+import random
 import numpy as np
 import torch
 import torchvision
@@ -110,7 +111,10 @@ elif config["mode"] == 'scan_scheduler':
                         projector_sizes = [512, 512, 512, 512], 
                         verbose = False)      
 
-    schedulers_list = ['None', 'Multiplicative', 'Cosine']
+    schedulers_list = [
+                    'None', 
+                    'Multiplicative', 
+                    'Cosine']
 
 
 
@@ -120,9 +124,12 @@ elif config["mode"] == 'scan_scheduler':
         
         print("Training with scheduler: " + str(sched_name))
 
+        torch.cuda.empty_cache()
+        random.seed(config["random_seed"])
+        np.random.seed(config["random_seed"])
         torch.manual_seed(config["random_seed"])
-        torch.cuda.empty_cache( )
-
+        #torch.use_deterministic_algorithms(True)
+        
         back_model = torchvision.models.resnet18(zero_init_residual=True)
         model = BarlowTwins(config["barlow_lambda"])
         model.add_backbone( 
@@ -155,10 +162,10 @@ elif config["mode"] == 'scan_scheduler':
             sched_losses[str(scheduler)] += losses
             print(f"---> Avg epoch loss: {np.mean(losses)}" )
 
-        torch.save(torch.tensor(sched_losses[str(scheduler)]), str(scheduler)+"_scan_loss.pt")
+        torch.save(torch.tensor(sched_losses[str(scheduler)]), sched_name +"_scan_loss.pt")
 
         plt.plot(range(len(sched_losses[str(scheduler)])), sched_losses[str(scheduler)])
-        plt.savefig(f"{sched_name}_sched_losses.png")
+        plt.savefig(sched_name+"_sched_losses.png")
 
 
 # %%

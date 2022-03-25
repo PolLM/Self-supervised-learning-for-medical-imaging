@@ -90,7 +90,7 @@ Notice that depending if the task is supervised or not, we expect the data_loade
 different parameters.
 For this function we used part of the code from aidl-2022 lab code called: lab_optimizers created by Daniel Fojo
 '''
-def scan_best_lr(data_loader, model, optimizer, config, criterion=False,  return_targets = False, loss_scan_range = [-8, -1]):
+def scan_best_lr(data_loader, model, optimizer, config, criterion=False,  return_targets=False, loss_scan_range = [-8, -1]):
     model.to(config["device"])
     steps = len(data_loader)-1
     loss_history = []
