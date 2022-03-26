@@ -1,3 +1,10 @@
+import torch
+
+def accuracy(labels, outputs):
+    preds = outputs.argmax(-1)
+    acc = (preds == labels.view_as(preds)).float().detach().numpy().mean()
+    return acc
+
 def topk_accuracy(output, target, topk=(1,)):
     """Computes the accuracy over the k top predictions for the specified values of k"""
     with torch.no_grad():

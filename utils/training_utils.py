@@ -26,7 +26,8 @@ def train_one_epoch(train_loader, model, optimizer, config, criterion=False, ret
 
             output = model(x)
             loss = criterion(output, y)
-            targets += torch.flatten(y).toliost()
+            print(loss)
+            targets += torch.flatten(y).tolist()
             predictions += torch.flatten(output).tolist()
             losses.append(loss.item()/batch_s)
         else:
@@ -75,7 +76,7 @@ def eval_one_epoch(eval_loader, model, optimizer, config, criterion=False):
 
         output = model(x)
         loss = criterion(output, y)
-        targets += torch.flatten(y).toliost()
+        targets += torch.flatten(y).tolist()
         predictions += torch.flatten(output).tolist()
         losses.append(loss.item()/batch_s)
         return(losses, targets, predictions)
