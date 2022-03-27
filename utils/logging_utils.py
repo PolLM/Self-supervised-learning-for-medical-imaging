@@ -15,7 +15,7 @@ def store_data(model, optimizer, scheduler, hyperparams):
     checkpoint['optimizer'] = optimizer.state_dict()
     checkpoint['scheduelr'] = scheduler.state_dict()
     checkpoint['hyperparams'] = hyperparams
-    save_checkpoint(checkpoint, False, get_file_name())
+    save_checkpoint(checkpoint, filename = get_file_name())
 
 def load_data(model, optimizer, scheduler, filename):
     checkpoint = torch.load(filename)
