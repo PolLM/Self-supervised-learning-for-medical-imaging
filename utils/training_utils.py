@@ -2,6 +2,13 @@ import torch
 import numpy as np
 from tqdm import tqdm
 
+import os
+import sys
+PROJECT_PATH =  os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+sys.path.insert(0,PROJECT_PATH)
+
+from utils.metrics import accuracy
+
 '''
 Training for one epoch. 
 If return_targets=True we assume we are training a supervised model, therefore, we return the target and predicted labels
@@ -9,13 +16,14 @@ for computing other metrics like accuracy, precision, recall, ...
 Notice that depending if the task is supervised or not, we expect the data_loader and the loss to input and output
 different parameters.
 '''
-def train_one_epoch(train_loader, model, optimizer, config, criterion=False, return_targets=False):
+def train_one_epoch(train_loader, model, optimizer, config, epoch, criterion=False, return_targets=False, writer = False):
     model.to(config["device"])
     model.train()
     losses = []
     targets = []
     predictions = []
-    for data in tqdm(train_loader):
+    len_data = len(train_loader)
+    for batch, data in enumerate(tqdm(train_loader)):
         if return_targets:
             x = data[0]
             y = data[1]
@@ -26,10 +34,14 @@ def train_one_epoch(train_loader, model, optimizer, config, criterion=False, ret
 
             output = model(x)
             loss = criterion(output, y)
-            print(loss)
-            targets += torch.flatten(y).tolist()
-            predictions += torch.flatten(output).tolist()
-            losses.append(loss.item()/batch_s)
+            targets.append(y.cpu().detach().numpy())
+            predictions.append(output.cpu().detach().numpy())
+            losses.append(loss.item())
+            if writer:
+                writer.add_scalar('Loss/train', loss.item(), epoch*len_data + batch)
+                writer.add_scalar('Acc/train', accuracy(y.cpu(), output.cpu()), epoch*len_data + batch)
+            
+
         else:
             x1 = data[0][0]
             x2 = data[0][1]
@@ -40,13 +52,13 @@ def train_one_epoch(train_loader, model, optimizer, config, criterion=False, ret
         
             loss, on_diag, off_diag = model(x1, x2)
             losses.append(loss.item())
+            if writer:
+                writer.add_scalar('Loss/train', loss.item(), epoch*len_data + batch)
         
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
 
-        
-    
     if return_targets: 
         return(losses, targets, predictions)
     else:
@@ -60,13 +72,14 @@ Notice that depending if the task is supervised or not, we expect the data_loade
 different parameters.
 '''
 @torch.no_grad()
-def eval_one_epoch(eval_loader, model, optimizer, config, criterion=False):
+def eval_one_epoch(eval_loader, model, config, criterion, epoch, writer = False):
     model.to(config["device"])
-    model.evaluation()
+    model.eval()
     losses = []
     targets = []
     predictions = []
-    for data in tqdm(eval_loader):
+    len_data = len(eval_loader)
+    for batch, data in enumerate(tqdm(eval_loader)):
         x = data[0]
         y = data[1]
 
@@ -76,10 +89,13 @@ def eval_one_epoch(eval_loader, model, optimizer, config, criterion=False):
 
         output = model(x)
         loss = criterion(output, y)
-        targets += torch.flatten(y).tolist()
-        predictions += torch.flatten(output).tolist()
-        losses.append(loss.item()/batch_s)
-        return(losses, targets, predictions)
+        targets.append(y.cpu().detach().numpy())
+        predictions.append(output.cpu().detach().numpy())
+        losses.append(loss.item())
+        if writer:
+            writer.add_scalar('Loss/eval', loss.item(), epoch*len_data + batch)
+            writer.add_scalar('Acc/eval', accuracy(y.cpu(), output.cpu()), epoch*len_data + batch)
+    return(losses, targets, predictions)
 
         
 
@@ -113,7 +129,7 @@ def scan_best_lr(data_loader, model, optimizer, config, criterion=False,  return
 
             output = model(x)
             loss = criterion(output, y)
-            loss_history.append(loss.item()/batch_s)
+            #loss_history.append(loss.item()/batch_s)
         else:
             x1 = data[0][0]
             x2 = data[0][1]
@@ -123,12 +139,13 @@ def scan_best_lr(data_loader, model, optimizer, config, criterion=False,  return
             batch_s = x1.shape[0]
 
             loss, on_diag, off_diag = model(x1, x2)
-            loss_history.append(loss.item())
+            #loss_history.append(loss.item())
 
         loss.backward()
         optimizer.step()
         loss_history.append(loss.item()/batch_s)
     return(lr_range, loss_history)
+
 
 def split_dataset():
     xray=pd.read_csv('data/Frontal_Train.csv')

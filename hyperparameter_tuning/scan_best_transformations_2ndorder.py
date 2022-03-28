@@ -71,21 +71,7 @@ by angle δ ∼ U(−20, 20) degree
 #### (10) change of perspective
 
 ##################################################
-Due to the ammount of possibilities we have decided to proceed according to the following strategy:
-1. We start with a set of base transformations:
-    - random resizing/cropping
-    - random horizontal flipping, 
-
-2. To this set of base tranformations we will do one extra tranformation and train the model,
-and we will iterate through all the extra transformations. Set of extra transformations:
-    - random Gaussian blur + Gaussian noise addition
-    - histogram normalization
-    - random rotation
-    - random additive brightness modulation + random multiplicative contrast modulation
-    - change of perspective
-    - random vertical flipping
-
-3. Once done thnis, we will try combinations of the base transformations + the most successful "extra"
+3. Once done this, we will try combinations of the base transformations + the most successful "extra"
 transformations. 
 
 ##################################################
@@ -94,7 +80,7 @@ transformations.
 
 
 config = {
-    "mode": 'linear_projector',
+    "mode": 'linear_projector',#'scan_transforms',
     "random_seed": 73,
     "num_epochs": 20,
     "batch_size": 128,
@@ -124,20 +110,41 @@ base_transforms = [
                 ]
 
 extra_transforms = {
-                "None"                    :[transforms.ToTensor()],
-                "gaussian_blur_noise"     :[GaussianBlur(p=prob), transforms.ToTensor(), GaussianNoise(p=prob)],
-                "equalize"                :[torchvision.transforms.RandomEqualize(p=prob), transforms.ToTensor()],
-                "rotation"                :[torchvision.transforms.RandomRotation(20), transforms.ToTensor()],
-                "brightness_contrast"     :[transforms.ToTensor(), BrightnessModulation(p=prob), ContrastModulation(p=prob)],
-                "perspective"             :[torchvision.transforms.RandomPerspective(distortion_scale=0.15, p=prob), transforms.ToTensor()],
-                "vertical_flip"           :[torchvision.transforms.RandomVerticalFlip(p=prob), transforms.ToTensor()],
+                "vertical_flip-equalize"   :[
+                                            torchvision.transforms.RandomVerticalFlip(p=prob), 
+                                            torchvision.transforms.RandomEqualize(p=prob),
+                                            transforms.ToTensor()],
+
+                "vertical_flip-equalize-perspective"     :[
+                                            torchvision.transforms.RandomVerticalFlip(p=prob), 
+                                            torchvision.transforms.RandomEqualize(p=prob),
+                                            torchvision.transforms.RandomPerspective(distortion_scale=0.15, p=prob),
+                                            transforms.ToTensor()],
+
+                "vertical_flip-equalize-perspective-blur"     :[
+                                            torchvision.transforms.RandomVerticalFlip(p=prob), 
+                                            torchvision.transforms.RandomEqualize(p=prob),
+                                            GaussianBlur(p=prob),
+                                            torchvision.transforms.RandomPerspective(distortion_scale=0.15, p=prob),
+                                            transforms.ToTensor(),
+                                            GaussianNoise(p=prob),],                                            
+
+                "vertical_flip-equalize-perspective-blur-rotation"     :[
+                                            torchvision.transforms.RandomVerticalFlip(p=prob), 
+                                            torchvision.transforms.RandomEqualize(p=prob),
+                                            GaussianBlur(p=prob),
+                                            torchvision.transforms.RandomPerspective(distortion_scale=0.15, p=prob),
+                                            torchvision.transforms.RandomRotation(20),
+                                            transforms.ToTensor(),
+                                            GaussianNoise(p=prob),],   
+
 }
 
 if config["mode"] == "scan_transforms":
     '''
     #################################################################################################
     Self Supervised training
-    On This part we iterate through all the extra transformations and train the model in a 
+    On This part we iterate through combinations of the extra transformations and train the model in a 
     self-supervised way (barlow twins). We log the rsults and save the last and best model state dict
     #################################################################################################
     '''
@@ -278,7 +285,7 @@ elif config["mode"] == "linear_projector":
         #Adapt model and add linear projector
         model.fc = nn.Sequential( nn.Linear(512, config["num_classes"]))
 
-        ##Freeze all parameters but the last one
+        #Freeze all parameters but the last one
         #for name, param in model.named_parameters():
         #    if "fc." in name:
         #        continue
