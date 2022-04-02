@@ -191,8 +191,9 @@ def load_resnet18_with_barlow_weights(barlow_state_dict_path, num_classes = 4):
             del state_dict[k]
         else:
             state_dict[k[13:]] = state_dict.pop(k)
-
-    model.load_state_dict(state_dict)
+    
+    if(barlow_state_dict != None):
+        model.load_state_dict(state_dict)
 
     #Adapt model and add linear projector
     model.fc = nn.Sequential( nn.Linear(512, num_classes))
