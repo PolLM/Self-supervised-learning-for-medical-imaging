@@ -175,7 +175,7 @@ def freeze_model(model, str_pattern="fc."):
     return(model)
 
 '''
-Freeze the model except the layers that contain str_pattern
+Load the model with the pre-trained weights from barlow thwins
 '''
 def load_resnet18_with_barlow_weights(barlow_state_dict_path, num_classes = 4):
     #Calling resnet model
