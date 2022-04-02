@@ -279,11 +279,11 @@ elif config["mode"] == "linear_projector":
         model.fc = nn.Sequential( nn.Linear(512, config["num_classes"]))
 
         ##Freeze all parameters but the last one
-        #for name, param in model.named_parameters():
-        #    if "fc." in name:
-        #        continue
-        #    else:
-        #        param.requires_grad = False
+        for name, param in model.named_parameters():
+            if "fc." in name:
+                continue
+            else:
+                param.requires_grad = False
 
         #Criterion
         criterion = torch.nn.CrossEntropyLoss()
