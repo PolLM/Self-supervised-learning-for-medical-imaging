@@ -154,3 +154,13 @@ def split_dataset():
 
     test.to_csv("test.csv",index=False)
     train.to_csv("train.csv",index=False)
+
+
+def freeze_model(model, str_pattern):
+    #Freeze all parameters but the last one
+    for name, param in model.named_parameters():
+        if str_pattern in name:
+            continue
+        else:
+            param.requires_grad = False
+    return(model)
