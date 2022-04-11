@@ -175,7 +175,7 @@ def freeze_model(model, str_pattern="fc."):
     return(model)
 
 '''
-Load the model with the pre-trained weights from barlow thwins
+Freeze the model except the layers that contain str_pattern
 '''
 def load_resnet18_with_barlow_weights(barlow_state_dict_path, num_classes = 4):
     #Calling resnet model
@@ -183,16 +183,18 @@ def load_resnet18_with_barlow_weights(barlow_state_dict_path, num_classes = 4):
     model.conv1 = nn.Conv2d(1, 64, 7, 2, 3, bias=False)
 
     #loading state dict and adapting it for the model (from Barlow Twins model to simple resnet model)
-    barlow_state_dict = torch.load(barlow_state_dict_path)
-    state_dict = barlow_state_dict.copy()
+    if(barlow_state_dict_path != None):
+        barlow_state_dict = torch.load(barlow_state_dict_path,map_location=torch.device('cpu'))
+        
+        state_dict = barlow_state_dict.copy()
 
-    for k,v in barlow_state_dict.items():
-        if "backbone" not in k:
-            del state_dict[k]
-        else:
-            state_dict[k[13:]] = state_dict.pop(k)
-
-    model.load_state_dict(state_dict)
+        for k,v in barlow_state_dict.items():
+            if "backbone" not in k:
+                del state_dict[k]
+            else:
+                state_dict[k[13:]] = state_dict.pop(k)
+    
+        model.load_state_dict(state_dict)
 
     #Adapt model and add linear projector
     model.fc = nn.Sequential( nn.Linear(512, num_classes))

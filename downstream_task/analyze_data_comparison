@@ -1,0 +1,284 @@
+import numpy as np
+import pandas as pd
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+xraylist = pd.read_csv("output.csv")
+
+mydict = {
+    'Loss/train:pretrained 1 percent of samples' : np.zeros(25),
+    'Loss/valid:pretrained 1 percent of samples' : np.zeros(25),
+    'Loss/train:not_pretrained 1 percent of samples' : np.zeros(25),
+    'Loss/valid:not_pretrained 1 percent of samples' : np.zeros(25),
+    
+    'Loss/train:pretrained 5 percent of samples' : np.zeros(25),
+    'Loss/valid:pretrained 5 percent of samples' : np.zeros(25),
+    'Loss/train:not_pretrained 5 percent of samples' : np.zeros(25),
+    'Loss/valid:not_pretrained 5 percent of samples' : np.zeros(25),
+
+    
+    'Loss/train:pretrained 10 percent of samples' : np.zeros(25),
+    'Loss/valid:pretrained 10 percent of samples' : np.zeros(25),
+    'Loss/train:not_pretrained 10 percent of samples' : np.zeros(25),
+    'Loss/valid:not_pretrained 10 percent of samples' : np.zeros(25),
+
+    
+    'Loss/train:pretrained 15 percent of samples' : np.zeros(25),
+    'Loss/valid:pretrained 15 percent of samples' : np.zeros(25),
+    'Loss/train:not_pretrained 15 percent of samples' : np.zeros(25),
+    'Loss/valid:not_pretrained 15 percent of samples' : np.zeros(25),
+
+    
+    'Loss/train:pretrained 20 percent of samples' : np.zeros(25),
+    'Loss/valid:pretrained 20 percent of samples' : np.zeros(25),
+    'Loss/train:not_pretrained 20 percent of samples' : np.zeros(25),
+    'Loss/valid:not_pretrained 20 percent of samples' : np.zeros(25),
+
+    
+    'Loss/train:pretrained 25 percent of samples' : np.zeros(25),
+    'Loss/valid:pretrained 25 percent of samples' : np.zeros(25),
+    'Loss/train:not_pretrained 25 percent of samples' : np.zeros(25),
+    'Loss/valid:not_pretrained 25 percent of samples' : np.zeros(25),
+
+}
+
+
+for data in range(len(xraylist)):
+    strings = xraylist.iloc[data, 1].split(" ")
+    rest,training = strings[0].split(":")
+    _,metric = rest.split("/")
+    perc = int(strings[1])
+    array = mydict[xraylist.iloc[data,1]]
+    array[int(xraylist.iloc[data,3])] = xraylist.iloc[data,2]
+
+
+def print_graphs(listofgraphs,listoflabels,where, legend=None):
+    fig, ax = plt.subplots()
+    for idx,element in enumerate(listofgraphs):
+        ax.plot(element, label=listoflabels[idx])
+    if(legend!=None):
+        ax.legend(loc=legend)
+    else:
+        ax.legend()
+
+    plt.savefig(where)
+
+graphs = [
+    mydict['Loss/train:pretrained 1 percent of samples'],
+    mydict['Loss/train:not_pretrained 1 percent of samples']
+]
+
+labels = [
+    "Pretrained 1%",
+    "NOT Pretrained 1%"
+]
+
+print_graphs(graphs,labels,"1percent_train.png")
+
+graphs = [
+    mydict['Loss/train:pretrained 5 percent of samples'],
+    mydict['Loss/train:not_pretrained 5 percent of samples']
+]
+
+labels = [
+    "Pretrained 5%",
+    "NOT Pretrained 5%"
+]
+
+print_graphs(graphs,labels,"5percent_train.png")
+
+graphs = [
+    mydict['Loss/train:pretrained 10 percent of samples'],
+    mydict['Loss/train:not_pretrained 10 percent of samples']
+]
+
+labels = [
+    "Pretrained 10%",
+    "NOT Pretrained 10%"
+]
+
+print_graphs(graphs,labels,"10percent_train.png")
+
+
+graphs = [
+    mydict['Loss/train:pretrained 15 percent of samples'],
+    mydict['Loss/train:not_pretrained 15 percent of samples']
+]
+
+labels = [
+    "Pretrained 15%",
+    "NOT Pretrained 15%"
+]
+
+print_graphs(graphs,labels,"15percent_train.png")
+
+graphs = [
+    mydict['Loss/train:pretrained 20 percent of samples'],
+    mydict['Loss/train:not_pretrained 20 percent of samples']
+]
+
+labels = [
+    "Pretrained 20%",
+    "NOT Pretrained 20%"
+]
+
+print_graphs(graphs,labels,"20percent_train.png")
+
+
+graphs = [
+    mydict['Loss/train:pretrained 25 percent of samples'],
+    mydict['Loss/train:not_pretrained 25 percent of samples']
+]
+
+labels = [
+    "Pretrained 25%",
+    "NOT Pretrained 25%"
+]
+
+print_graphs(graphs,labels,"25percent_train.png")
+
+
+graphs = [
+    mydict['Loss/valid:pretrained 1 percent of samples'],
+    mydict['Loss/valid:not_pretrained 1 percent of samples']
+]
+
+labels = [
+    "Pretrained 1%",
+    "NOT Pretrained 1%"
+]
+
+print_graphs(graphs,labels,"1percent_valid.png")
+
+graphs = [
+    mydict['Loss/valid:pretrained 5 percent of samples'],
+    mydict['Loss/valid:not_pretrained 5 percent of samples']
+]
+
+labels = [
+    "Pretrained 5%",
+    "NOT Pretrained 5%"
+]
+
+print_graphs(graphs,labels,"5percent_valid.png")
+
+graphs = [
+    mydict['Loss/valid:pretrained 10 percent of samples'],
+    mydict['Loss/valid:not_pretrained 10 percent of samples']
+]
+
+labels = [
+    "Pretrained 10%",
+    "NOT Pretrained 10%"
+]
+
+print_graphs(graphs,labels,"10percent_valid.png")
+
+
+graphs = [
+    mydict['Loss/valid:pretrained 15 percent of samples'],
+    mydict['Loss/valid:not_pretrained 15 percent of samples']
+]
+
+labels = [
+    "Pretrained 15%",
+    "NOT Pretrained 15%"
+]
+
+print_graphs(graphs,labels,"15percent_valid.png")
+
+
+graphs = [
+    mydict['Loss/valid:pretrained 20 percent of samples'],
+    mydict['Loss/valid:not_pretrained 20 percent of samples']
+]
+
+labels = [
+    "Pretrained 20%",
+    "NOT Pretrained 20%"
+]
+
+print_graphs(graphs,labels,"20percent_valid.png")
+
+graphs = [
+    mydict['Loss/valid:pretrained 25 percent of samples'],
+    mydict['Loss/valid:not_pretrained 25 percent of samples']
+]
+
+labels = [
+    "Pretrained 25%",
+    "NOT Pretrained 25%"
+]
+
+print_graphs(graphs,labels,"25percent_valid.png")
+
+graphs = [
+    mydict['Loss/valid:pretrained 1 percent of samples'],
+    mydict['Loss/valid:pretrained 5 percent of samples'],
+    mydict['Loss/valid:pretrained 10 percent of samples'],
+    mydict['Loss/valid:pretrained 15 percent of samples'],
+    mydict['Loss/valid:pretrained 20 percent of samples'],
+    mydict['Loss/valid:pretrained 25 percent of samples'],
+
+    mydict['Loss/valid:not_pretrained 1 percent of samples'],
+    mydict['Loss/valid:not_pretrained 5 percent of samples'],
+    mydict['Loss/valid:not_pretrained 10 percent of samples'],
+    mydict['Loss/valid:not_pretrained 15 percent of samples'],
+    mydict['Loss/valid:not_pretrained 20 percent of samples'],
+    mydict['Loss/valid:not_pretrained 25 percent of samples']
+
+]
+
+labels = [
+    "Pretrained 1%",
+    "Pretrained 5%",
+    "Pretrained 10%",
+    "Pretrained 15%",
+    "Pretrained 20%",
+    "Pretrained 25%",
+    "NOT Pretrained 1%",
+    "NOT Pretrained 5%",
+    "NOT Pretrained 10%",
+    "NOT Pretrained 15%",
+    "NOT Pretrained 20%",
+    "NOT Pretrained 25%"
+]
+
+print_graphs(graphs,labels,"valid_full.png",legend="upper left")
+
+
+
+fig, ax = plt.subplots()  # Create a figure containing a single axes.
+ax.plot(mydict['Loss/train:pretrained 1 percent of samples'],label="Pretrained 1%");  # Plot some data on the axes.
+ax.plot(mydict['Loss/train:pretrained 5 percent of samples'],label="Pretrained 5%");  # Plot some data on the axes.
+ax.plot(mydict['Loss/train:pretrained 10 percent of samples'],label="Pretrained 10%");  # Plot some data on the axes.
+ax.plot(mydict['Loss/train:pretrained 15 percent of samples'],label="Pretrained 15%");  # Plot some data on the axes.
+ax.plot(mydict['Loss/train:pretrained 20 percent of samples'],label="Pretrained 20%");  # Plot some data on the axes.
+ax.plot(mydict['Loss/train:pretrained 25 percent of samples'],label="Pretrained 25%");  # Plot some data on the axesnot_.
+
+ax.plot(mydict['Loss/train:not_pretrained 1 percent of samples'],label="NOT Pretrained 1%");  # Plot some data on the axes.
+ax.plot(mydict['Loss/train:not_pretrained 5 percent of samples'],label="NOT Pretrained 5%");  # Plot some data on the axes.
+ax.plot(mydict['Loss/train:not_pretrained 10 percent of samples'],label="NOT Pretrained 10%");  # Plot some data on the axes.
+ax.plot(mydict['Loss/train:not_pretrained 15 percent of samples'],label="NOT Pretrained 15%");  # Plot some data on the axes.
+ax.plot(mydict['Loss/train:not_pretrained 20 percent of samples'],label="NOT Pretrained 20%");  # Plot some data on the axes.
+ax.plot(mydict['Loss/train:not_pretrained 25 percent of samples'],label="NOT Pretrained 25%");  # Plot some data on the axes.
+ax.legend()
+
+
+plt.savefig('train_full.png')        
+
+difference = [
+    [1,mydict['Loss/valid:pretrained 1 percent of samples'][-1] - mydict['Loss/valid:not_pretrained 1 percent of samples'][-1]],
+    [5,mydict['Loss/valid:pretrained 5 percent of samples'][-1] - mydict['Loss/valid:not_pretrained 5 percent of samples'][-1]],
+    [10,mydict['Loss/valid:pretrained 10 percent of samples'][-1] - mydict['Loss/valid:not_pretrained 10 percent of samples'][-1]],
+    [15,mydict['Loss/valid:pretrained 15 percent of samples'][-1] - mydict['Loss/valid:not_pretrained 15 percent of samples'][-1]],
+    [20,mydict['Loss/valid:pretrained 20 percent of samples'][-1] - mydict['Loss/valid:not_pretrained 20 percent of samples'][-1]],
+    [25,mydict['Loss/valid:pretrained 25 percent of samples'][-1] - mydict['Loss/valid:not_pretrained 25 percent of samples'][-1]],
+]
+
+fig, ax = plt.subplots()  # Create a figure containing a single axes.
+ax.plot(
+    [1,5,10,15,20,25],
+    [difference[0][1],difference[1][1],difference[2][1],difference[3][1],difference[4][1],difference[5][1]],
+);  # Plot some data on the axes.
+plt.savefig('difference.png')        
