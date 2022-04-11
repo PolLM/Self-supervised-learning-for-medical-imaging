@@ -22,6 +22,7 @@ from utils.training_utils import train_one_epoch,eval_one_epoch,scan_best_lr
 from utils.logging_utils import save_checkpoint, save_dict_to_pickle
 from utils.metrics import accuracy
 from augmentations.transform_utils import Transform, GaussianBlur, GaussianNoise, BrightnessModulation, ContrastModulation
+from dataset_loader.CheXpertDataset import CheXpertDataset
 
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -39,14 +40,14 @@ We can't use bayessian optimization since barlow twins is a self-supervised mode
 save the model and assess its performance in a downstream task. 
 '''
 
-def self_supervised_train(config, barlow_lambda, projector_dims):
+def self_supervised_train(config, barlow_lambda, projector_dims, dataset_name="CheXpert"):
 
     projector_sizes = ''
     for i in projector_dims:
         projector_sizes += f"_{i}_"
-    folder_name = str(barlow_lambda) + projector_sizes 
+    folder_name = str(barlow_lambda) + projector_sizes + dataset_name
 
-    checkpoints_path = os.path.join(PROJECT_PATH, f"runs/final_trainings/{folder_name}_300")
+    checkpoints_path = os.path.join(PROJECT_PATH, f"runs/final_trainings/{folder_name}_50")
     writer = SummaryWriter(checkpoints_path)
     #Resetting seeds to have the same initial model parameters
     torch.cuda.empty_cache()
@@ -99,7 +100,7 @@ def self_supervised_train(config, barlow_lambda, projector_dims):
 config = {
             "mode": 'linear_projector',
             "random_seed": 73,
-            "num_epochs": 300,
+            "num_epochs": 60,
             "batch_size": 128,
             "barlow_lambda": 5e-3,
             "device": torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu"),
@@ -133,13 +134,16 @@ if config["mode"] == 'self_supervised':
                     GaussianNoise(p=prob),])
 
 
-    dataset = ImageFolder("F:/Datasets/chest-x-ray/COVID-19_Radiography_Dataset/", transform=Transform(transform, transform))
-    loader = torch.utils.data.DataLoader(dataset,
-                                        batch_size=config["batch_size"],
-                                        shuffle=True)
+    dataset_train = CheXpertDataset(r"F:\Datasets\CheXpert-v1.0-small\Frontal_Train.csv",r"F:\Datasets", transform=Transform(transform, transform))
+
+    loader= torch.utils.data.DataLoader(dataset_train,
+                                            batch_size=config["batch_size"],
+                                            shuffle=True)
+
     
     #for barlow_lambda in [1e-1,5e-2,1e-2,5e-3,1e-3, 5e-4, 1e-4]:
     #   self_supervised_train(config, barlow_lambda, [512,512,512,512])
+    print(len(loader))
     self_supervised_train(config, barlow_lambda = config["barlow_lambda"], projector_dims=config["projector"])
 
 elif config["mode"] == "linear_projector":
@@ -156,14 +160,16 @@ elif config["mode"] == "linear_projector":
         for subdirectory in subdirectories:
             if "ACC" in subdirectory:# or "0.0001_512__512__512__512_1e-05" in subdirectory:
                 continue
+            if "CheXpert" not in subdirectory:
+                continue
 
             print("%"*40)
-            print(f"Applying hypoerparams:  {subdirectory}")
+            print(f"Applying hyperparams:  {subdirectory}")
             print("%"*40)
             
             #Logging
             selfsup_checkpoints_path = os.path.join(root, subdirectory)
-            checkpoints_path = os.path.join(root, subdirectory + "ACC_full25_Hflip_prediction")
+            checkpoints_path = os.path.join(root, subdirectory + "ACC_CheXpert_full25_Hflip_prediction")
 
             writer = SummaryWriter(checkpoints_path)
             #Resetting seeds to have the same initial model parameters
