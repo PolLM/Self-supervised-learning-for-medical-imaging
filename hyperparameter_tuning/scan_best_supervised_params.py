@@ -49,7 +49,7 @@ def supervised_train(config, i, model_type):
     #################################################################################################
     '''
     cropping = config["soft_crop"]
-    folder_logs = f"runs\\final_trainings\\scan_supervised\\{model_type}_iter_{i}_crop_{cropping}"
+    folder_logs = f"runs\\final_trainings\\scan_supervised_4_50runs\\{model_type}_iter_{i}_crop_{cropping}"
     checkpoints_path = os.path.join(config["project_path"], folder_logs)
     
     print(config["project_path"])
@@ -72,6 +72,7 @@ def supervised_train(config, i, model_type):
     torch.manual_seed(config["random_seed"])
 
     #Define dataset with the trasnformation
+    config["soft_crop"] = 0
     if config["soft_crop"] != 0:
         transform = transforms.Compose([
                                         transforms.Grayscale(),
@@ -190,24 +191,21 @@ def supervised_train(config, i, model_type):
 
 pretrained_models = [
     r"D:\Documents\GitHub\aidl2022_final_project\runs\final_trainings\0.005_512__512__300",
-    r"D:\Documents\GitHub\aidl2022_final_project\runs\final_trainings\0.005_512__512_CheXpert_50"
+    #r"D:\Documents\GitHub\aidl2022_final_project\runs\final_trainings\0.005_512__512_CheXpert_50"
 ]
+SCAN_ITERATIONS = 50
 
-SCAN_ITERATIONS = 30
+lr = [10**(-5 * np.random.uniform(0.4, 1)) for _ in range(SCAN_ITERATIONS)]
+weight_decay = [10**(-8 * np.random.uniform(0.4, 1)) for _ in range(SCAN_ITERATIONS)]
+optimizer = np.random.randint(0,1, SCAN_ITERATIONS)
+soft_crop = np.random.randint(0,1, SCAN_ITERATIONS)
+num_epochs = np.random.randint(5,21, SCAN_ITERATIONS)
 
 for j, model_path in enumerate(pretrained_models):
     if j==0:
         model_type = "covid_300"
     else:
         model_type = "chexpert_60"
-
-    #Sample random Adam or SGD
-    #Sample lr
-    lr = [10**(-4 * np.random.uniform(0.5, 1)) for _ in range(SCAN_ITERATIONS)]
-    weight_decay = [10**(-8 * np.random.uniform(0.5, 1)) for _ in range(SCAN_ITERATIONS)]
-    optimizer = np.random.randint(0,2, SCAN_ITERATIONS)
-    soft_crop = np.random.randint(0,2, SCAN_ITERATIONS)
-    batch = np.random.randint(1,5, SCAN_ITERATIONS) * 32
 
     for i in range(SCAN_ITERATIONS):
 
@@ -218,18 +216,19 @@ for j, model_path in enumerate(pretrained_models):
             "random_seed": 73,
             "device": torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu"),
             "img_res": 224,
-            "num_classes": 4,
-            "num_epochs_sup": 10,        
+            "num_classes": 4,       
             "train_frac": 0.8,
             "test_frac": 0.1,
             "val_frac": 0.1,
             "transforms_prob": 0.5,
             "h_flip": 1, 
+            "batch_size_sup": 96,#64, # 32,64,128,
             
             "optimizer": optimizer[i],#"Adam", #Adam, SDG
             "optimizer_weight_decay": weight_decay[i],#1e-5, # 0, 1e-4
             "soft_crop": soft_crop[i],#250, # o, 250
             "lr_sup": lr[i],#1e-4, # 1e-3, 1e-5
-            "batch_size_sup": int(batch[i]),#64, # 32,64,128
+            "num_epochs_sup": int(num_epochs[i]), 
+            
             }
         supervised_train(config, i, model_type)

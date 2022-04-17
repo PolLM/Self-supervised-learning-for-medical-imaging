@@ -75,6 +75,8 @@ if config["mode"] == 'scan_lr':
     lr_range, loss_history = scan_best_lr(loader, model, optimizer, config)
     print(len(lr_range), len(loss_history))
     print(lr_range, loss_history)
+    np.savetxt(r"D:\Documents\GitHub\aidl2022_final_project\runs\optimal_lr\scan_lr.txt", np.array(lr_range) )
+    np.savetxt(r"D:\Documents\GitHub\aidl2022_final_project\runs\optimal_lr\loss_lr.txt", np.array(loss_history) )
     plt.plot(np.array(lr_range), np.array(loss_history))
     plt.xscale("log")
     plt.savefig('scan.png')
@@ -155,7 +157,7 @@ elif config["mode"] == 'scan_scheduler':
 
         for epoch in range(config["num_epochs"]):
             
-            losses = train_one_epoch(loader, model, optimizer, config)
+            losses = train_one_epoch(loader, model, optimizer, config, epoch)
             if scheduler is not None:
                 scheduler.step()
 

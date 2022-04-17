@@ -142,7 +142,7 @@ if config["mode"] == 'self_supervised':
     #   self_supervised_train(config, barlow_lambda, [512,512,512,512])
     
     for projector in [[512,512],[512,1024]]:
-        for barlow_lambda in [1e-3, 5e-4]:
+        for barlow_lambda in [1e-2, 5e-3]:
             self_supervised_train(config, barlow_lambda, projector)
 
 elif config["mode"] == "linear_projector":

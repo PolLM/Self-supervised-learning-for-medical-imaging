@@ -278,12 +278,12 @@ elif config["mode"] == "linear_projector":
         #Adapt model and add linear projector
         model.fc = nn.Sequential( nn.Linear(512, config["num_classes"]))
 
-        ##Freeze all parameters but the last one
-        for name, param in model.named_parameters():
-            if "fc." in name:
-                continue
-            else:
-                param.requires_grad = False
+        ###Freeze all parameters but the last one
+        #for name, param in model.named_parameters():
+        #    if "fc." in name:
+        #        continue
+        #    else:
+        #        param.requires_grad = False
 
         #Criterion
         criterion = torch.nn.CrossEntropyLoss()
@@ -301,10 +301,14 @@ elif config["mode"] == "linear_projector":
         ##Scan best lr
         #lr_range, loss_history = scan_best_lr(train_loader, model, optimizer, config, criterion=criterion,  return_targets=True)
         #print(len(lr_range), len(loss_history))
+        #np.savetxt(r"D:\Documents\GitHub\aidl2022_final_project\runs\optimal_lr\scan_lr_sup.txt", np.array(lr_range) )
+        #np.savetxt(r"D:\Documents\GitHub\aidl2022_final_project\runs\optimal_lr\loss_lr_sup.txt", np.array(loss_history) )
+#
         #plt.plot(np.array(lr_range), np.array(loss_history))
         #plt.xscale("log")
-        #plt.savefig(os.path.join(checkpoints_path, "scan_sup_lr.png"))
+        ##plt.savefig(os.path.join(checkpoints_path, "scan_sup_lr.png"))
         #plt.show()
+
 
 
         for epoch in range(config["num_epochs_sup"]):    
