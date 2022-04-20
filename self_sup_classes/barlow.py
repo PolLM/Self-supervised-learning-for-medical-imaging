@@ -60,8 +60,6 @@ class NetWrapper(nn.Module):
 
 
 
-
-
 class BarlowTwins(nn.Module):
     '''
     Adapted from https://github.com/facebookresearch/barlowtwins for arbitrary backbones, and arbitrary choice of which

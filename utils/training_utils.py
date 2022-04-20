@@ -7,6 +7,7 @@ import torchvision
 import torch.nn as nn
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
+import pandas as pd
 
 import os
 import sys

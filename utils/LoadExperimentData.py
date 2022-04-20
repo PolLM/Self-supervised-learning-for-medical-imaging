@@ -45,16 +45,14 @@ def load_log_data(path, logname = False, metric = "Acc/eval", num_epochs = "num_
 
 def load_log_data_unsup(path, logname = False, metric = "Acc/eval", num_epochs = "num_epochs"):
     base_path = os.path.dirname(path)
-    #config = load_pickle_dict(base_path)
     df = tflog2pandas(base_path)
     df = df[df['metric'].str.contains(metric)]
-    #batches_per_epoch = int(len(df)/config[num_epochs])  
-    #df = df.groupby(np.arange(len(df)) // batches_per_epoch).mean()
     df["step"] = df.index
     if logname:
         df = df.rename(columns={"step": "step_"+logname,
                                 "value": "value_"+logname})
     return(df) 
+
 
 def many_logs2pandas(path, contains = False, not_contains = False,  mode = 'sup', metric = "Acc/eval"):
 
@@ -75,6 +73,9 @@ def many_logs2pandas(path, contains = False, not_contains = False,  mode = 'sup'
                     
     elif os.path.isfile(path):
         event_paths = [path]
+    
+    else:
+        print('Not a path nor a file!')
 
     all_logs = pd.DataFrame()
     for path in event_paths:

@@ -25,8 +25,37 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 
 torch.cuda.empty_cache( )
+
+config = {
+    "mode": 'full_network',
+    "checkpoins_basepath": os.path.join(PROJECT_PATH, f"runs/test"), #path where to save the logs, change if necessary
+    "selfsup_dataset_path": "F:/Datasets/chest-x-ray/COVID-19_Radiography_Dataset/", #path of the selfsup dataset, change if necessary
+    "sup_dataset_path": "F:/Datasets/chest-x-ray/COVID-19_Radiography_Dataset/", #path of the supervised dataset, change if necessary
+    "random_seed": 73,
+    "num_epochs": 20,
+    "batch_size": 128,
+    "device": torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu"),
+    "barlow_lambda": 5e-3,
+    "projector_dims": [512, 512, 512, 512],
+    "optimizer": "Adam",
+    "lr": 2e-3,
+    "optimizer_weight_decay": 1e-5,
+    "transforms_prob": 0.5,
+    "img_res": 224,
+    "num_classes": 4,
+    "num_epochs_sup": 5,
+    "train_frac": 0.8,
+    "test_frac": 0.1,
+    "val_frac": 0.1,
+    "lr_sup": 1e-4,
+    "batch_size_sup": 64,
+}
+
 config = {
     "mode": 'scan_scheduler',
+    "checkpoins_basepath": os.path.join(PROJECT_PATH, f"runs/test"), #path where to save the logs, change if necessary
+    "selfsup_dataset_path": "F:/Datasets/chest-x-ray/COVID-19_Radiography_Dataset/", #path of the selfsup dataset, change if necessary
+    "sup_dataset_path": "F:/Datasets/chest-x-ray/COVID-19_Radiography_Dataset/", #path of the supervised dataset, change if necessary
     "random_seed": 73,
     "num_epochs": 10,
     "batch_size": 128,
@@ -43,7 +72,7 @@ transform = transforms.Compose([
                 transforms.RandomHorizontalFlip(p=0.5),
                 transforms.ToTensor(),
             ])
-dataset = ImageFolder("F:/Datasets/chest-x-ray/COVID-19_Radiography_Dataset/", transform=Transform(transform, transform))
+dataset = ImageFolder(config["selfsup_dataset_path"], transform=Transform(transform, transform))
 
 loader = torch.utils.data.DataLoader(dataset,
                                     batch_size=config["batch_size"],
@@ -53,8 +82,8 @@ loader = torch.utils.data.DataLoader(dataset,
 if config["mode"] == 'scan_lr': 
     '''
     This code is used to scan the optimal lr to train the Barlow Twins model. 
-    Learnings: From the optimal lr range, We will start with the highest lr value,
-    we will set this value to as the starting lr value for our trainings.
+    Learnings: Inside the optimal lrs range, we will start with the highest lr value,
+    we will use this lr value for our trainings.
 
     Observations: We have found this lr value to be, approx lr: 2e-3
     '''                              
@@ -73,13 +102,11 @@ if config["mode"] == 'scan_lr':
 
     optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"], weight_decay=config["optimizer_weight_decay"])
     lr_range, loss_history = scan_best_lr(loader, model, optimizer, config)
-    print(len(lr_range), len(loss_history))
-    print(lr_range, loss_history)
-    np.savetxt(r"D:\Documents\GitHub\aidl2022_final_project\runs\optimal_lr\scan_lr.txt", np.array(lr_range) )
-    np.savetxt(r"D:\Documents\GitHub\aidl2022_final_project\runs\optimal_lr\loss_lr.txt", np.array(loss_history) )
+    #np.savetxt(r"D:\Documents\GitHub\aidl2022_final_project\runs\optimal_lr\scan_lr.txt", np.array(lr_range) )
+    #np.savetxt(r"D:\Documents\GitHub\aidl2022_final_project\runs\optimal_lr\loss_lr.txt", np.array(loss_history) )
     plt.plot(np.array(lr_range), np.array(loss_history))
     plt.xscale("log")
-    plt.savefig('scan.png')
+    #plt.savefig('scan.png')
     plt.show()
 
 
@@ -118,9 +145,6 @@ elif config["mode"] == 'scan_scheduler':
                     'Multiplicative', 
                     'Cosine']
 
-
-
-
     sched_losses = defaultdict(list)
     for sched_name in schedulers_list:
         
@@ -131,7 +155,21 @@ elif config["mode"] == 'scan_scheduler':
         np.random.seed(config["random_seed"])
         torch.manual_seed(config["random_seed"])
         #torch.use_deterministic_algorithms(True)
+
+        #Loading dataset
+        transform = transforms.Compose([
+                        transforms.Grayscale(),
+                        transforms.RandomResizedCrop((224, 224), interpolation=Image.BICUBIC),
+                        transforms.RandomHorizontalFlip(p=0.5),
+                        transforms.ToTensor(),
+                    ])
+        dataset = ImageFolder(config["selfsup_dataset_path"], transform=Transform(transform, transform))
+
+        loader = torch.utils.data.DataLoader(dataset,
+                                            batch_size=config["batch_size"],
+                                            shuffle=True)
         
+        #Loading model
         back_model = torchvision.models.resnet18(zero_init_residual=True)
         model = BarlowTwins(config["barlow_lambda"])
         model.add_backbone( 
@@ -145,6 +183,7 @@ elif config["mode"] == 'scan_scheduler':
                             projector_sizes = [512, 512, 512, 512], 
                             verbose = False)                    
 
+        #Optimizer and scheduler
         optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"], weight_decay=config["optimizer_weight_decay"])
 
         
@@ -154,7 +193,7 @@ elif config["mode"] == 'scan_scheduler':
             scheduler = torch.optim.lr_scheduler.MultiplicativeLR(optimizer, lr_lambda=lambda epoch: 0.64, last_epoch=- 1, verbose=True)
         elif sched_name == 'Cosine':
             scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=config["num_epochs"], verbose=True)
-
+        
         for epoch in range(config["num_epochs"]):
             
             losses = train_one_epoch(loader, model, optimizer, config, epoch)
@@ -164,10 +203,10 @@ elif config["mode"] == 'scan_scheduler':
             sched_losses[str(scheduler)] += losses
             print(f"---> Avg epoch loss: {np.mean(losses)}" )
 
-        torch.save(torch.tensor(sched_losses[str(scheduler)]), sched_name +"_scan_loss.pt")
-
+        #torch.save(torch.tensor(sched_losses[str(scheduler)]), sched_name +"_scan_loss.pt")
         plt.plot(range(len(sched_losses[str(scheduler)])), sched_losses[str(scheduler)])
-        plt.savefig(sched_name+"_sched_losses.png")
+        plt.show()
+        #plt.savefig(sched_name+"_sched_losses.png")
 
 
 # %%

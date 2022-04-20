@@ -2,7 +2,6 @@
 from logging import exception
 import ssl
 import os
-import numpy as np
 import time
 
 import sys 
@@ -19,12 +18,10 @@ import torch
 from torchvision import models
 from torchsummary import summary
 #import torchvision.transforms as transforms
-import torchvision.datasets as dsets
 from torchvision.datasets import ImageFolder
 
 from tqdm import tqdm
-import matplotlib.pylab as plt
-import json
+
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 BATCH_SIZE_LIST = [2**5, 2**6, 2**7, 2**8, 2**9, 2**10, 2**11]
@@ -34,14 +31,14 @@ IMG_DIM_LIST = [
                 (32,32), (64, 64), (128, 128), (256, 256), (512, 512), (1024, 1024),
                 (32,32), (64, 64), (128, 128), (256, 256), (512, 512), (1024, 1024),
                 (32,32), (64, 64), (128, 128), (256, 256), (512, 512), (1024, 1024),
-                #(256, 224),(256, 240),(288, 288),(320, 300),(384, 380),
+                (256, 224),(256, 240),(288, 288),(320, 300),(384, 380),
                 ]
 MODEL = [
         "Resnet18", "Resnet18", "Resnet18", "Resnet18", "Resnet18", "Resnet18", 
         "Resnet34", "Resnet34", "Resnet34", "Resnet34", "Resnet34", "Resnet34", 
         "Resnet50", "Resnet50", "Resnet50", "Resnet50", "Resnet50", "Resnet50",
         "Resnet101", "Resnet101", "Resnet101", "Resnet101", "Resnet101", "Resnet101",
-        #"EfficientnetB0", "EfficientnetB1", "EfficientnetB2", "EfficientnetB3", "EfficientnetB4"
+        "EfficientnetB0", "EfficientnetB1", "EfficientnetB2", "EfficientnetB3", "EfficientnetB4"
         ]
 
 IN_CHAN = ["CH3"]
@@ -157,18 +154,12 @@ for CH in IN_CHAN:
 
             start_time = time.time()
 
-            #print(f"SIZE DATASET: {len(loader)}")
-
             try:
                 for batch_idx, ((x1,x2), _) in enumerate(tqdm(loader)):
                     
                     if batch_idx == 0:
                         print(x1.shape)
-                        #plt.imshow(torch.movedim(x1[0], 0, 2), origin='lower')
-                        #plt.show()
-                        #plt.imshow(torch.movedim(x2[0], 0, 2), origin='lower')
-                        #plt.show()
-                    
+
                     x1, x2 = x1.to(device), x2.to(device)
                     loss = learner(x1, x2)
                     optimizer.zero_grad()
@@ -176,17 +167,13 @@ for CH in IN_CHAN:
                     optimizer.step()
                     loss_list.append(loss.item())
 
-                #time_for_epoch[f"{M}_inChan{CH}_batch{BATCH_SIZE}_res_{IMG_DIM_H}_{IMG_DIM_W}"] = time.time() - start_time
-                #f.write(f"{M}_inChan{CH}_batch{BATCH_SIZE}_res_{IMG_DIM_H}_{IMG_DIM_W}: {time.time() - start_time}\n")
                 with open('runs/barlowtwins/scan_model_times.txt', 'a') as f:
                     f.write(f"{M} {CH} {BATCH_SIZE} {IMG_DIM_H} {IMG_DIM_W} {time.time() - start_time}\n")
             except Exception as e:
                 print(f"\n EXCEPTION!!!!! {e} \n")
-                #time_for_epoch[f"{M}_inChan{CH}_batch{BATCH_SIZE}_res_{IMG_DIM_H}_{IMG_DIM_W}"] = 'OOM'                 #f.write(f"{M}_inChan{CH}_batch{BATCH_SIZE}_res_{IMG_DIM_H}_{IMG_DIM_W}: OOM\n")
                 with open('runs/barlowtwins/scan_model_times.txt', 'a') as f:
                     f.write(f"{M} {CH} {BATCH_SIZE} {IMG_DIM_H} {IMG_DIM_W} OOM\n")
-        #with open(f'runs/barlowtwins/scan_{M}_inChan{CH}_batch{BATCH_SIZE}_res_{IMG_DIM_H}_{IMG_DIM_W}.json', 'w') as fp:
-        #    json.dump(time_for_epoch, fp)           
+       
 
 # %%
 
