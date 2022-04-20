@@ -34,7 +34,7 @@ def supervised_train(config, checkpoints_path, train_loader, val_loader):
     :param val_loader:loader of the validation part of the dataset
 
     This function trains a resnet-18 in a supervised way (using the labels)
-    Notice that one cahn choose between training the entire model or only a linear projector (last layer of the model)
+    Notice that one can choose between training the entire model or only a linear projector (last layer of the model)
     '''
     #Logging
     writer = SummaryWriter(checkpoints_path)
@@ -121,7 +121,7 @@ def self_supervised_train(config, loader, checkpoints_path):
     :param checkpoints_path: path where to save the checkpoints
     :param loader: loader of the dataset
 
-    This function trains a BarlowTwins model (using resnet-18 as backbone) in a self-supervised way
+    This function trains a BarlowTwins model (using resnet-18 as backbone) in a self-supervised approach
     '''
 
     #checkpoints_path = os.path.join(PROJECT_PATH, f"runs/hyperparams/{folder_name}_transform")

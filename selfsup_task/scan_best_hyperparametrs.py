@@ -1,15 +1,9 @@
 #%%
-import random
-import numpy as np
 import torch
 import torchvision
-import torch.nn as nn
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
 
-from torch.utils.tensorboard import SummaryWriter
-
-import matplotlib.pylab as plt
 from PIL import Image
 import os
 import ssl

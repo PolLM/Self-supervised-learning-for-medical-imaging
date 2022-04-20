@@ -16,6 +16,7 @@ sys.path.insert(0,PROJECT_PATH)
 
 from utils.metrics import accuracy
 
+
 '''
 Training for one epoch. 
 If return_targets=True we assume we are training a supervised model, therefore, we return the target and predicted labels

@@ -5,13 +5,14 @@ import torch
 import torchvision
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
+
 import matplotlib.pylab as plt
 from collections import defaultdict
 from PIL import Image
 import os
 import ssl
 import sys 
-import json
+
 
 PROJECT_PATH =  os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 sys.path.insert(0,PROJECT_PATH)
@@ -26,30 +27,6 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 torch.cuda.empty_cache( )
 
-config = {
-    "mode": 'full_network',
-    "checkpoins_basepath": os.path.join(PROJECT_PATH, f"runs/test"), #path where to save the logs, change if necessary
-    "selfsup_dataset_path": "F:/Datasets/chest-x-ray/COVID-19_Radiography_Dataset/", #path of the selfsup dataset, change if necessary
-    "sup_dataset_path": "F:/Datasets/chest-x-ray/COVID-19_Radiography_Dataset/", #path of the supervised dataset, change if necessary
-    "random_seed": 73,
-    "num_epochs": 20,
-    "batch_size": 128,
-    "device": torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu"),
-    "barlow_lambda": 5e-3,
-    "projector_dims": [512, 512, 512, 512],
-    "optimizer": "Adam",
-    "lr": 2e-3,
-    "optimizer_weight_decay": 1e-5,
-    "transforms_prob": 0.5,
-    "img_res": 224,
-    "num_classes": 4,
-    "num_epochs_sup": 5,
-    "train_frac": 0.8,
-    "test_frac": 0.1,
-    "val_frac": 0.1,
-    "lr_sup": 1e-4,
-    "batch_size_sup": 64,
-}
 
 config = {
     "mode": 'scan_scheduler',
@@ -193,7 +170,7 @@ elif config["mode"] == 'scan_scheduler':
             scheduler = torch.optim.lr_scheduler.MultiplicativeLR(optimizer, lr_lambda=lambda epoch: 0.64, last_epoch=- 1, verbose=True)
         elif sched_name == 'Cosine':
             scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=config["num_epochs"], verbose=True)
-        
+
         for epoch in range(config["num_epochs"]):
             
             losses = train_one_epoch(loader, model, optimizer, config, epoch)

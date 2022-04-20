@@ -1,13 +1,10 @@
 #%%
 import random
 import numpy as np
-from sklearn import linear_model
 import torch
 import torchvision
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
-
-from torch.utils.tensorboard import SummaryWriter
 
 from PIL import Image
 import os
@@ -180,7 +177,6 @@ if config["mode"] == "scan_transforms":
         
         #Logging
         checkpoints_path = os.path.join(config["checkpoins_basepath"], f"{extra_T_name}_transform")
-        writer = SummaryWriter(checkpoints_path)
         #Resetting seeds to have the same initial model parameters
         torch.cuda.empty_cache()
         random.seed(config["random_seed"])
