@@ -3,6 +3,9 @@ import torch
 import numpy as np
 
 def accuracy_batch(labels, outputs):
+    '''
+    Computes the accuracy over one batch
+    '''
     total_acc = []
     for lab, out in zip(labels, outputs):
         lab, out = torch.tensor(lab), torch.tensor(out)
@@ -12,13 +15,18 @@ def accuracy_batch(labels, outputs):
     return np.mean(total_acc)
 
 def accuracy(labels, outputs_logits):
+    '''
+    Computes the accuracy
+    '''
     outputs = torch.softmax(outputs_logits, dim=1)
     preds = outputs.argmax(-1)
     acc = (preds == labels.view_as(preds)).float().detach().numpy().mean()
     return acc
 
 def topk_accuracy(output, target, topk=(1,)):
-    """Computes the accuracy over the k top predictions for the specified values of k"""
+    '''
+    Computes the accuracy over the k top predictions for the specified values of k
+    '''
     with torch.no_grad():
         maxk = max(topk)
         batch_size = target.size(0)

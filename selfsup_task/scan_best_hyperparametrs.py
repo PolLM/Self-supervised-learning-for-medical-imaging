@@ -33,8 +33,8 @@ Also, since both variables are discrete we can't perform a random sampling searc
 '''
 
 config = {
-    "mode": 'full_network',
-    "checkpoins_basepath": os.path.join(PROJECT_PATH, f"runs/test"), #path where to save the logs, change if necessary
+    "mode": 'self_supervised',#self_supervised , full_network, linear_projector
+    "checkpoins_basepath": os.path.join(PROJECT_PATH, f"runs/hyperparams"), #path where to save the logs, change if necessary
     "selfsup_dataset_path": "F:/Datasets/chest-x-ray/COVID-19_Radiography_Dataset/", #path of the selfsup dataset, change if necessary
     "sup_dataset_path": "F:/Datasets/chest-x-ray/COVID-19_Radiography_Dataset/", #path of the supervised dataset, change if necessary
     "random_seed": 73,
@@ -116,7 +116,7 @@ elif config["mode"] == "linear_projector" or config["mode"] == "full_network":
             for i in config["projector_dims"]:
                 projector_sizes += f"_{i}_"
             folder_name = str(barlow_lambda) + projector_sizes
-            checkpoints_path = os.path.join(config["checkpoins_basepath"], f"{folder_name}_transform" + "ACC_{training_mode}_iter_prediction")
+            checkpoints_path = os.path.join(config["checkpoins_basepath"], f"{folder_name}_transform" + f"ACC_{training_mode}_iter_prediction")
             config["model_path"] = os.path.join(config["checkpoins_basepath"], f"{folder_name}_transform")
             #Define dataset with the trasnformations
             transform = transforms.Compose([

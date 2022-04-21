@@ -25,8 +25,8 @@ and now we load the models and find the most optimal hyperparameters to train th
 '''
     
 config = {  
-    "mode": "full_network",
-    "checkpoins_basepath": os.path.join(PROJECT_PATH, f"runs/test"), #path where to save the logs, change if necessary
+    "mode": "full_network",#full_network, linear_projector
+    "checkpoins_basepath": os.path.join(PROJECT_PATH, f"runs/supervised_hyperparams"), #path where to save the logs, change if necessary
     "sup_dataset_path": "F:/Datasets/chest-x-ray/COVID-19_Radiography_Dataset/", #path of the supervised dataset, change if necessary
     "random_seed": 73,
     "device": torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu"),
@@ -52,47 +52,8 @@ SCAN_ITERATIONS = 50
 #Random sampling of the hyperparameters (not using ray.tune due to some problems with the gpu)
 lr = [10**(-5 * np.random.uniform(0.4, 1)) for _ in range(SCAN_ITERATIONS)]
 weight_decay = [10**(-8 * np.random.uniform(0.4, 1)) for _ in range(SCAN_ITERATIONS)]
-optimizer = np.random.randint(0,1, SCAN_ITERATIONS)
-soft_crop = np.random.randint(0,1, SCAN_ITERATIONS)
 num_epochs = np.random.randint(5,21, SCAN_ITERATIONS)
 batch_size = np.random.randint(1,5, SCAN_ITERATIONS)*32
-
-#Resetting seeds to have the same initial model parameters
-torch.cuda.empty_cache()
-random.seed(config["random_seed"])
-np.random.seed(config["random_seed"])
-torch.manual_seed(config["random_seed"])
-
-#Define dataset with the trasnformation
-transform = transforms.Compose([
-                                transforms.Grayscale(),
-                                transforms.Resize(config["img_res"], interpolation=Image.BICUBIC),
-                                transforms.RandomHorizontalFlip(p=config["transforms_prob"]),
-                                transforms.ToTensor()
-                                ])
-
-dataset = ImageFolder(config["sup_dataset_path"], transform)
-
-#Test train split
-train_len = int(config["train_frac"]*len(dataset))
-val_len = int(config["test_frac"]*len(dataset))
-test_len = len(dataset) - train_len - val_len
-train_dataset, test_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_len, val_len, test_len])
-
-train_loader = torch.utils.data.DataLoader(
-train_dataset,
-batch_size=config["batch_size_sup"], 
-shuffle=True)
-
-val_loader = torch.utils.data.DataLoader(
-val_dataset,
-batch_size=config["batch_size_sup"], 
-shuffle=True)
-
-test_loader = torch.utils.data.DataLoader(
-test_dataset,
-batch_size=config["batch_size_sup"], 
-shuffle=True)
 
 #Loop over pre-trained models
 for model_type, model_path in PRETRAINED_MODELS.items():
@@ -107,5 +68,43 @@ for model_type, model_path in PRETRAINED_MODELS.items():
         config["num_epochs_sup"]= int(num_epochs[i])
         config["batch_size_sup"] = int(batch_size[i])
 
-        checkpoints_path = os.path.join(config["checkpoins_basepath"], f"scan_supervised_{model_type}_iter_{i}")
+        #Resetting seeds to have the same initial model parameters
+        torch.cuda.empty_cache()
+        random.seed(config["random_seed"])
+        np.random.seed(config["random_seed"])
+        torch.manual_seed(config["random_seed"])
+
+        #Define dataset with the trasnformation
+        transform = transforms.Compose([
+                                        transforms.Grayscale(),
+                                        transforms.Resize(config["img_res"], interpolation=Image.BICUBIC),
+                                        transforms.RandomHorizontalFlip(p=config["transforms_prob"]),
+                                        transforms.ToTensor()
+                                        ])
+
+        dataset = ImageFolder(config["sup_dataset_path"], transform)
+
+        #Test train split
+        train_len = int(config["train_frac"]*len(dataset))
+        val_len = int(config["test_frac"]*len(dataset))
+        test_len = len(dataset) - train_len - val_len
+        train_dataset, test_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_len, val_len, test_len])
+
+        train_loader = torch.utils.data.DataLoader(
+        train_dataset,
+        batch_size=config["batch_size_sup"], 
+        shuffle=True)
+
+        val_loader = torch.utils.data.DataLoader(
+        val_dataset,
+        batch_size=config["batch_size_sup"], 
+        shuffle=True)
+
+        test_loader = torch.utils.data.DataLoader(
+        test_dataset,
+        batch_size=config["batch_size_sup"], 
+        shuffle=True)
+
+        mode = config["mode"]
+        checkpoints_path = os.path.join(config["checkpoins_basepath"], f"scan_supervised_{model_type}_{mode}_iter_{i}")
         supervised_train(config, checkpoints_path, train_loader, val_loader)

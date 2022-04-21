@@ -28,7 +28,7 @@ chest Xray dataset. In our case we have trained the model with two datasets:
 
 config = {
     "mode": "covid_dataset", #covid_dataset,  chexpert_dataset
-    "checkpoins_basepath": os.path.join(PROJECT_PATH, f"runs/test"), #path where to save the logs, change if necessary
+    "checkpoins_basepath": os.path.join(PROJECT_PATH, f"runs/final_trainings"), #path where to save the logs, change if necessary
     "selfsup_dataset_path": "F:/Datasets/chest-x-ray/COVID-19_Radiography_Dataset/", #path of the selfsup dataset, change to CheXpert if necessary
     "random_seed": 73,
     "num_epochs": 300, #60 if training CheXpert

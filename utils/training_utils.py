@@ -17,14 +17,24 @@ sys.path.insert(0,PROJECT_PATH)
 from utils.metrics import accuracy
 
 
-'''
-Training for one epoch. 
-If return_targets=True we assume we are training a supervised model, therefore, we return the target and predicted labels
-for computing other metrics like accuracy, precision, recall, ...
-Notice that depending if the task is supervised or not, we expect the data_loader and the loss to input and output
-different parameters.
-'''
+
 def train_one_epoch(train_loader, model, optimizer, config, epoch, criterion=False, return_targets=False, writer = False):
+    '''
+    :param train_loader: Loader of the training dataset
+    :param model: model to train
+    :param optimizer: optimizer used in the training
+    :param config: dictionary that contains some parameters needed for the training
+    :param epoch: current epoch of the training (useful if reporting to tensorboard)
+    :param criterion: Loss function 
+    :param return_targets: If True, appart from the loss, return targets and predictions
+    :param writer: tensorboard writer to log the results
+
+    Training for one epoch. 
+    If return_targets=True we assume we are training a supervised model, therefore, we return the target and predicted labels
+    for computing other metrics like accuracy, precision, recall, ...
+    Notice that depending if the task is supervised or not, we expect the data_loader and the loss to input and output
+    different parameters.
+    '''
     model.to(config["device"])
     model.train()
     losses = []
@@ -72,15 +82,23 @@ def train_one_epoch(train_loader, model, optimizer, config, epoch, criterion=Fal
     else:
         return(losses)
 
-'''
-Testing/ealuating for one epoch. 
-If return_targets=True we assume we are training a supervised model, therefore, we return the target and predicted labels
-for computing other metrics like accuracy, precision, recall, ...
-Notice that depending if the task is supervised or not, we expect the data_loader and the loss to input and output
-different parameters.
-'''
+
 @torch.no_grad()
 def eval_one_epoch(eval_loader, model, config, criterion, epoch, writer = False):
+    '''
+    :param eval_loader: Loader of the validation dataset
+    :param model: model to validate
+    :param config: dictionary that contains some parameters needed for the validation
+    :param epoch: current epoch of the training (useful if reporting to tensorboard)
+    :param criterion: Loss function 
+    :param writer: tensorboard writer to log the results
+
+    Testing/ealuating for one epoch. 
+    If return_targets=True we assume we are training a supervised model, therefore, we return the target and predicted labels
+    for computing other metrics like accuracy, precision, recall, ...
+    Notice that depending if the task is supervised or not, we expect the data_loader and the loss to input and output
+    different parameters.
+    '''
     model.to(config["device"])
     model.eval()
     losses = []
@@ -108,14 +126,23 @@ def eval_one_epoch(eval_loader, model, config, criterion, epoch, writer = False)
         
 
 
-'''
-Scanning the most optimal learning rate
-If return_targets=True we assume we are scanning the lr for a supervised model. 
-Notice that depending if the task is supervised or not, we expect the data_loader and the loss to input and output
-different parameters.
-For this function we used part of the code from aidl-2022 lab code called: lab_optimizers created by Daniel Fojo
-'''
+
 def scan_best_lr(data_loader, model, optimizer, config, criterion=False,  return_targets=False, loss_scan_range = [-8, -1]):
+    '''
+    :param data_loader: Loader of the dataset
+    :param model: model to scan best lr
+    :param optimizer: optimizer used in the scan
+    :param config: dictionary that contains some parameters needed for the scan
+    :param criterion: Loss function 
+    :param return_targets: If True, appart from the loss, return targets and predictions
+    :param loss_scan_range: range (powers of 10) of the lr scan
+
+    Scanning the most optimal learning rate
+    If return_targets=True we assume we are scanning the lr for a supervised model. 
+    Notice that depending if the task is supervised or not, we expect the data_loader and the loss to input and output
+    different parameters.
+    For this function we used part of the code from aidl-2022 lab code called: lab_optimizers created by Daniel Fojo
+    '''
     model.to(config["device"])
     steps = len(data_loader)-1
     loss_history = []
@@ -164,10 +191,11 @@ def split_dataset():
     train.to_csv("train.csv",index=False)
 
 
-'''
-Freeze the model except the layers that contain str_pattern
-'''
+
 def freeze_model(model, str_pattern="fc."):
+    '''
+    Freeze the model except the layers that contain str_pattern
+    '''
     #Freeze all parameters but the last one
     for name, param in model.named_parameters():
         if str_pattern in name:
@@ -176,10 +204,11 @@ def freeze_model(model, str_pattern="fc."):
             param.requires_grad = False
     return(model)
 
-'''
-Freeze the model except the layers that contain str_pattern
-'''
+
 def load_resnet18_with_barlow_weights(barlow_state_dict_path, num_classes = 4):
+    '''
+    Initialize resnet18 model and load weights from barlow twins model
+    '''
     #Calling resnet model
     model = torchvision.models.resnet18(zero_init_residual=True)
     model.conv1 = nn.Conv2d(1, 64, 7, 2, 3, bias=False)

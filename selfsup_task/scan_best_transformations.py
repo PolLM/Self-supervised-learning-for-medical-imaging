@@ -86,8 +86,8 @@ transformations.
 
 
 config = {
-    "mode": 'full_network',
-    "checkpoins_basepath": os.path.join(PROJECT_PATH, f"runs/test"), #path where to save the logs, change if necessary
+    "mode": 'full_network',#scan_transforms , full_network, linear_projector
+    "checkpoins_basepath": os.path.join(PROJECT_PATH, f"runs/transforms"), #path where to save the logs, change if necessary
     "selfsup_dataset_path": "F:/Datasets/chest-x-ray/COVID-19_Radiography_Dataset/", #path of the selfsup dataset, change if necessary
     "sup_dataset_path": "F:/Datasets/chest-x-ray/COVID-19_Radiography_Dataset/", #path of the supervised dataset, change if necessary
     "random_seed": 73,
