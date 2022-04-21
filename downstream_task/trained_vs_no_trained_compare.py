@@ -1,17 +1,4 @@
-import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader
-import torchvision.models as models
-
-from torchvision.datasets import ImageFolder
-from torch.utils.tensorboard import SummaryWriter
-import math
-from compare_networks import compare_networks
-import os
-from torchvision import transforms
-
-
-model_dict = "/content/resnet18_20epoch_self_supervised/resnet18_best_state_dict.pt"
+model_dict = "/content/resnet18_300epoc_self_supervised/resnet18_best_state_dict.pt"
 #batch_size = 128
 batch_size = 128
 num_classes = 4
@@ -24,17 +11,31 @@ ListOfTags=      ["1 percent of samples",
                     "20 percent of samples",
                     "25 percent of samples"]
 
+ListOfDicts_barlow_1 = [None,None,None,None,None,None]
+ListOfDicts_barlow = [None,None,None,None,None,None]
+ListOfDicts_resnet_1 = [None,None,None,None,None,None]
+ListOfDicts_resnet = [None,None,None,None,None,None]
+
 config = {
-    "mode": 'scan_scheduler',
-    "random_seed": 73,
-    "num_epochs": 25,
-    "batch_size": 128,
-    "device": torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu"),
-    "barlow_lambda": 5e-3,
-    "optimizer": "Adam",
-    "lr": 2e-3,
-    "optimizer_weight_decay": 1e-5,
-}
+    'project_path': 'D:\\Documents\\GitHub\\aidl2022_final_project', 
+    'model_path': 'D:\\Documents\\GitHub\\aidl2022_final_project\\runs\\final_trainings\\0.005_512__512__300', 
+    'random_seed': 73, 
+    'device': torch.device(type='cuda'), 
+    'img_res': 224, 
+    'num_classes': 4, 
+    'train_frac': 0.8, 
+    'test_frac': 0.1, 
+    'val_frac': 0.1, 
+    'transforms_prob': 0.5, 
+    'h_flip': 1, 
+    'batch_size_sup': 96, 
+    'optimizer': 0, 
+    'optimizer_weight_decay': 9.870257603212248e-06, 
+    'soft_crop': 0, 
+    'lr_sup': 0.0015294613483158384, 
+    'num_epochs_sup': 15
+    }
+
 
 transform = transforms.Compose([
     
@@ -47,10 +48,12 @@ transform = transforms.Compose([
 dataset = ImageFolder("/content/COVID-19_Radiography_Dataset/",transform)
 
 
-val_len = 200
-train_dataset, val_dataset = torch.utils.data.random_split(dataset, [len(dataset)-val_len, val_len])
+val_len = int(len(dataset)*config["val_frac"])
+train_len = int(len(dataset)*config["train_frac"])
+test_len = int(len(dataset)-val_len - train_len)
+train_dataset, val_dataset,test_dataset = torch.utils.data.random_split(dataset, [train_len, val_len,test_len])
 
-writer = SummaryWriter(log_dir="/content/Compare_Dataset/")
+writer = SummaryWriter(log_dir="/content/Compare_Dataset/",comment="Compare trained vs untrained without logsoftmax")
 
 # Train supervised: 25 epochs 
 # provar 3 epochs només amb fc. 
@@ -67,7 +70,38 @@ for idx,perc in enumerate(ListOfCompares):
     dataset_reduced = torch.utils.data.random_split(train_dataset, [tr_split_len, len(train_dataset)-tr_split_len])[0]
     criterion = nn.CrossEntropyLoss()
     tag = ListOfTags[idx]
-    comparison.train(dataset_reduced, val_dataset, config['num_epochs'],criterion,config,writer,tag)    
+    comparison.train(dataset_reduced, val_dataset, config['num_epochs_sup'],criterion,config,writer,tag)    
+    ListOfDicts_barlow[idx], ListOfDicts_resnet[idx], ListOfDicts_barlow_1[idx], ListOfDicts_resnet_1[idx] = comparison.get_dicts()
+
+save_checkpoint(ListOfDicts_barlow[0],basepath='/content/state_dicts',filename='Barlow_15_epocs_1perc.pt')
+save_checkpoint(ListOfDicts_barlow[1],basepath='/content/state_dicts',filename='Barlow_15_epocs_5perc.pt')
+save_checkpoint(ListOfDicts_barlow[2],basepath='/content/state_dicts',filename='Barlow_15_epocs_10perc.pt')
+save_checkpoint(ListOfDicts_barlow[3],basepath='/content/state_dicts',filename='Barlow_15_epocs_15perc.pt')
+save_checkpoint(ListOfDicts_barlow[4],basepath='/content/state_dicts',filename='Barlow_15_epocs_20perc.pt')
+save_checkpoint(ListOfDicts_barlow[5],basepath='/content/state_dicts',filename='Barlow_15_epocs_25perc.pt')
+
+
+save_checkpoint(ListOfDicts_barlow_1[0],basepath='/content/state_dicts',filename='Barlow_1_epocs_1perc.pt')
+save_checkpoint(ListOfDicts_barlow_1[1],basepath='/content/state_dicts',filename='Barlow_1_epocs_5perc.pt')
+save_checkpoint(ListOfDicts_barlow_1[2],basepath='/content/state_dicts',filename='Barlow_1_epocs_10perc.pt')
+save_checkpoint(ListOfDicts_barlow_1[3],basepath='/content/state_dicts',filename='Barlow_1_epocs_15perc.pt')
+save_checkpoint(ListOfDicts_barlow_1[4],basepath='/content/state_dicts',filename='Barlow_1_epocs_20perc.pt')
+save_checkpoint(ListOfDicts_barlow_1[5],basepath='/content/state_dicts',filename='Barlow_1_epocs_25perc.pt')
+
+save_checkpoint(ListOfDicts_resnet[0],basepath='/content/state_dicts',filename='resnet_15_epocs_1perc.pt')
+save_checkpoint(ListOfDicts_resnet[1],basepath='/content/state_dicts',filename='resnet_15_epocs_5perc.pt')
+save_checkpoint(ListOfDicts_resnet[2],basepath='/content/state_dicts',filename='resnet_15_epocs_10perc.pt')
+save_checkpoint(ListOfDicts_resnet[3],basepath='/content/state_dicts',filename='resnet_15_epocs_15perc.pt')
+save_checkpoint(ListOfDicts_resnet[4],basepath='/content/state_dicts',filename='resnet_15_epocs_20perc.pt')
+save_checkpoint(ListOfDicts_resnet[5],basepath='/content/state_dicts',filename='resnet_15_epocs_25perc.pt')
+
+save_checkpoint(ListOfDicts_resnet_1[0],basepath='/content/state_dicts',filename='resnet_1_epocs_1perc.pt')
+save_checkpoint(ListOfDicts_resnet_1[1],basepath='/content/state_dicts',filename='resnet_1_epocs_5perc.pt')
+save_checkpoint(ListOfDicts_resnet_1[2],basepath='/content/state_dicts',filename='resnet_1_epocs_10perc.pt')
+save_checkpoint(ListOfDicts_resnet_1[3],basepath='/content/state_dicts',filename='resnet_1_epocs_15perc.pt')
+save_checkpoint(ListOfDicts_resnet_1[4],basepath='/content/state_dicts',filename='resnet_1_epocs_20perc.pt')
+save_checkpoint(ListOfDicts_resnet_1[5],basepath='/content/state_dicts',filename='resnet_1_epocs_25perc.pt')
+
 
 writer.flush()
 writer.close()
