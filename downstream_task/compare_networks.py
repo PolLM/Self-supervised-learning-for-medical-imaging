@@ -61,6 +61,7 @@ class compare_networks(nn.Module):
             running_loss += loss.item()
         
         return running_loss/len(dataloader_train)
+    
     @torch.no_grad()
     def valid_one_epoch(self,model, dataloader_valid, config):
         correct_pred = 0
