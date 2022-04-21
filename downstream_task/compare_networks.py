@@ -61,7 +61,6 @@ class compare_networks(nn.Module):
             running_loss += loss.item()
         
         return running_loss/len(dataloader_train)
-
     @torch.no_grad()
     def valid_one_epoch(self,model, dataloader_valid, config):
         correct_pred = 0
@@ -73,12 +72,8 @@ class compare_networks(nn.Module):
 
             _, predicted = torch.max(outputs.data,1)
 
-#            total_pred += labels.size(0)
-#            correct_pred += (predicted.data == labels).sum().item()
-
             pred = outputs.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
             correct_pred += pred.eq(labels.view_as(pred)).sum().item()
+            total_pred += labels.size(0)
 
-        #print(f'Validation results. Accuracy = {correct_pred/total_pred:.3f}')
-
-        return correct_pred/len(dataloader_valid)
+        return correct_pred/total_pred
