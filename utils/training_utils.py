@@ -230,3 +230,19 @@ def load_resnet18_with_barlow_weights(barlow_state_dict_path, num_classes = 4):
     #Adapt model and add linear projector
     model.fc = nn.Sequential( nn.Linear(512, num_classes))
     return(model)
+
+
+def load_barlowmodelwithweights_supervised(dict_path, num_classes = 4):
+    #Calling resnet model
+    model = torchvision.models.resnet18(zero_init_residual=True)
+    model.conv1 = nn.Conv2d(1, 64, 7, 2, 3, bias=False)
+    model.fc = nn.Sequential( nn.Linear(512, num_classes))
+
+    #loading state dict and adapting it for the model (from Barlow Twins model to simple resnet model)
+    barlow_state_dict = torch.load(dict_path,map_location=torch.device('cpu'))
+        
+    state_dict = barlow_state_dict.copy()
+
+    model.load_state_dict(state_dict)
+    #Adapt model and add linear projector
+    return(model)
