@@ -4,11 +4,11 @@ Authors: Francesc Garcia, Pol Llopart, Sergio Rodriguez
 
 Advisor: Kevin McGuinness
 
-##Project description and results
+## Project description and results
 
 The description of the project, toghether with the results obtained from all the experiments is explained in the file **Project_report.pdf **.
 
-##Repository Structure
+## Repository Structure
 
 The repository is structured as follows:
 
