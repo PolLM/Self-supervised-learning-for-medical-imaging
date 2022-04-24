@@ -42,10 +42,10 @@ The repository is structured as follows:
 - runs: Folder containing logs of all the experiments carried out. For each experiment we saved the config file (with the hyperparameters), the final and best model state_dict and the tensorboard logs. Each state_dict weights around 50Mb, it is for this reason tht we have added them into the .gitignore file.
 
 - self_sup_classes: Folder where the BarlowTwins class is defined.
-  - barlow.py: 
+  - barlow.py: Main class to implement Barlow Twins architecture.
  
 - utils: Folder containing useful functions used in other parts of the project.
-  - training_utils.py:
-  - metrics.py:
-  - logging_utils.py:
-  - load_tb_logs.py:
+  - training_utils.py: Functions used when training our models.
+  - metrics.py: Functions used to compute evaluation metrics.
+  - logging_utils.py: Functions used for logging.
+  - load_tb_logs.py: Functions used to extract tensorboard data.
