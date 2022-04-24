@@ -43,28 +43,22 @@ def CreateConfusionMatrix(model, dataloader_valid, config):
 
         _, predicted = torch.max(outputs.data,1)
 
+
         pred = outputs.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
 
         for elem in range(len(pred)):
             pred_matrix[labels[elem]][pred[elem]] += 1
 
+        total_pred += labels.size(0)
         correct_pred += pred.eq(labels.view_as(pred)).sum().item()
 
-    return correct_pred/len(dataloader_valid),pred_matrix
+    return correct_pred/total_pred,pred_matrix
 
 
 model_dict = "..."
 
 batch_size = 128
 num_classes = 4
-
-# ListOfCompares = [0.01,0.05,0.10,0.15,0.20,0.25]
-# ListOfTags=      ["1 percent of samples",
-#                     "5 percent of samples",
-#                     "10 percent of samples",
-#                     "15 percent of samples",
-#                     "20 percent of samples",
-#                     "25 percent of samples"]
 
 config = {
     "mode": 'scan_scheduler',
