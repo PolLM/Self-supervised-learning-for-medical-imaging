@@ -18,6 +18,7 @@ from selfsup_task.hyper_utils import self_supervised_train, supervised_train
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 ssl._create_default_https_context = ssl._create_unverified_context
 
+
 '''
 This code trains the Barlow Twins model with the learnings from all the hyperparameter 
 scans that we have performed previously. Notice that one can train the model with any

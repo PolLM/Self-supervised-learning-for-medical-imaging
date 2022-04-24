@@ -13,7 +13,6 @@ import os
 import ssl
 import sys 
 
-
 PROJECT_PATH =  os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 sys.path.insert(0,PROJECT_PATH)
 
@@ -36,17 +35,20 @@ config = {
     "random_seed": 73,
     "num_epochs": 10,
     "batch_size": 128,
+    "projector_dims": [512, 512, 512, 512],
+    "img_res": 224,
     "device": torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu"),
     "barlow_lambda": 5e-3,
     "optimizer": "Adam",
     "lr": 2e-3,
+    "transforms_prob": 0.5,
     "optimizer_weight_decay": 1e-5,
 }
 
 transform = transforms.Compose([
                 transforms.Grayscale(),
-                transforms.RandomResizedCrop((224, 224), interpolation=Image.BICUBIC),
-                transforms.RandomHorizontalFlip(p=0.5),
+                transforms.RandomResizedCrop((config["img_res"], config["img_res"]), interpolation=Image.BICUBIC),
+                transforms.RandomHorizontalFlip(p=config["transforms_prob"]),
                 transforms.ToTensor(),
             ])
 dataset = ImageFolder(config["selfsup_dataset_path"], transform=Transform(transform, transform))
@@ -74,7 +76,7 @@ if config["mode"] == 'scan_lr':
                         verbose=False)
 
     model.add_projector(
-                        projector_sizes = [512, 512, 512, 512], 
+                        projector_sizes = config["projector_dims"], 
                         verbose = True)                    
 
     optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"], weight_decay=config["optimizer_weight_decay"])
@@ -83,7 +85,7 @@ if config["mode"] == 'scan_lr':
     #np.savetxt(r"D:\Documents\GitHub\aidl2022_final_project\runs\optimal_lr\loss_lr.txt", np.array(loss_history) )
     plt.plot(np.array(lr_range), np.array(loss_history))
     plt.xscale("log")
-    #plt.savefig('scan.png')
+    plt.savefig('scan_lr.png')
     plt.show()
 
 
@@ -114,7 +116,7 @@ elif config["mode"] == 'scan_scheduler':
                         verbose=False)
 
     model.add_projector(
-                        projector_sizes = [512, 512, 512, 512], 
+                        projector_sizes = config["projector_dims"], 
                         verbose = False)      
 
     schedulers_list = [
@@ -136,8 +138,8 @@ elif config["mode"] == 'scan_scheduler':
         #Loading dataset
         transform = transforms.Compose([
                         transforms.Grayscale(),
-                        transforms.RandomResizedCrop((224, 224), interpolation=Image.BICUBIC),
-                        transforms.RandomHorizontalFlip(p=0.5),
+                        transforms.RandomResizedCrop((config["img_res"], config["img_res"]), interpolation=Image.BICUBIC),
+                        transforms.RandomHorizontalFlip(p=config["transforms_prob"]),
                         transforms.ToTensor(),
                     ])
         dataset = ImageFolder(config["selfsup_dataset_path"], transform=Transform(transform, transform))
@@ -157,7 +159,7 @@ elif config["mode"] == 'scan_scheduler':
                             verbose=False)
 
         model.add_projector(
-                            projector_sizes = [512, 512, 512, 512], 
+                            projector_sizes = config["projector_dims"], 
                             verbose = False)                    
 
         #Optimizer and scheduler
@@ -180,10 +182,10 @@ elif config["mode"] == 'scan_scheduler':
             sched_losses[str(scheduler)] += losses
             print(f"---> Avg epoch loss: {np.mean(losses)}" )
 
-        #torch.save(torch.tensor(sched_losses[str(scheduler)]), sched_name +"_scan_loss.pt")
+        torch.save(torch.tensor(sched_losses[str(scheduler)]), sched_name +"_scan_loss.pt")
         plt.plot(range(len(sched_losses[str(scheduler)])), sched_losses[str(scheduler)])
         plt.show()
-        #plt.savefig(sched_name+"_sched_losses.png")
+        plt.savefig(sched_name+"_sched_losses.png")
 
 
 # %%

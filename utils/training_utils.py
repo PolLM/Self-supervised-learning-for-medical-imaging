@@ -17,7 +17,6 @@ sys.path.insert(0,PROJECT_PATH)
 from utils.metrics import accuracy
 
 
-
 def train_one_epoch(train_loader, model, optimizer, config, epoch, criterion=False, return_targets=False, writer = False):
     '''
     :param train_loader: Loader of the training dataset

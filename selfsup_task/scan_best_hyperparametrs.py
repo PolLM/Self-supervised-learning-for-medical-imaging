@@ -12,7 +12,6 @@ import sys
 PROJECT_PATH =  os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 sys.path.insert(0,PROJECT_PATH)
 from selfsup_task.hyper_utils import self_supervised_train, supervised_train
-
 from augmentations.transform_utils import Transform, GaussianBlur, GaussianNoise, BrightnessModulation, ContrastModulation
 
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
