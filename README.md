@@ -32,9 +32,9 @@ The repository is structured as follows:
 
 - downstream_task: Folder containing all the experiments related with the supervised training of the pre-trained models.
   - scan_best_supervised_hyperparameters: Scans optimal parameters for the supervised training.
-  - compare_networks.py: TODO
+  - compare_networks.py: Containing one class that generates two resnet models: One pretrained (Dict is provided) and one non pre-trained. Allows to train and validate both models sequentially and log into a TensorFlow writer the results of loss/accuracy.
   - ConfusionMatrix: Outputs confusion matrix from model predictions.
-  - trained_vs_no_trained_compare: TODO
+  - trained_vs_no_trained_compare: Executes multiple trainings with different number of samples given a state dict and using the class 'compare_networks0.
   
 - interpretability: Folder containing the interpretability experiments carried out.
   - Grad-CAM.py: Applies Grad-CAM to interpret our models.
