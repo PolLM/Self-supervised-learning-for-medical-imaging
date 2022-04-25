@@ -12,15 +12,17 @@ The description of the project, toghether with the results obtained from all the
 
 The repository is structured as follows:
 
+Entry points of the project in bold font.
+
 - Project_report.pdf: Report of the project including scope and experiment results.
 
 - selfsup_task: Folder containing all the experiments related with the hyperparameter search and training of the Barlow Twins model.
-  - check_bt_resources.py: Find the Barlow Twins model execution time under several configurations. 
-  - scan_optimal_lr.py: Scans optimal lr and compares lr schedulers.
-  - scan_best_transformations.py: Scans different combinations of transformations.
-  - scan_best_hyperparametrs.py: Scans different combinations of Barlow Twins Lambda and projector head.
+  - **check_bt_resources.py**: Find the Barlow Twins model execution time under several configurations. 
+  - **scan_optimal_lr.py**: Scans optimal lr and compares lr schedulers.
+  - **scan_best_transformations.py**: Scans different combinations of transformations.
+  - **scan_best_hyperparametrs.py**: Scans different combinations of Barlow Twins Lambda and projector head.
   - hyper_utils.py: Utils related with the self-supervised tasks.
-  - train_barlow_twins.py: Final self-supervised training.
+  - **train_barlow_twins.py**: Final self-supervised training.
   
 - augmentations: Folder containing all the augmentations tested and used by the self-supervised model.
   - transform_utils.py: Contains all transformations not implemented in torchvison.
@@ -31,13 +33,13 @@ The repository is structured as follows:
 - datasets: Folder where the datasets are saved. Added in .gitignore file to avoid pushing the datasets. It is not mandatory to save them on this folder (one can change the folder path on each experiment).
 
 - downstream_task: Folder containing all the experiments related with the supervised training of the pre-trained models.
-  - scan_best_supervised_hyperparameters: Scans optimal parameters for the supervised training.
+  - **scan_best_supervised_hyperparameters**: Scans optimal parameters for the supervised training.
   - compare_networks.py: Containing one class that generates two resnet models: One pretrained (Dict is provided) and one non pre-trained. Allows to train and validate both models sequentially and log into a TensorFlow writer the results of loss/accuracy.
-  - ConfusionMatrix: Outputs confusion matrix from model predictions.
-  - trained_vs_no_trained_compare: Executes multiple trainings with different number of samples given a state dict and using the class 'compare_networks0.
+  - **ConfusionMatrix**: Outputs confusion matrix from model predictions.
+  - **trained_vs_no_trained_compare**: Executes multiple trainings with different number of samples given a state dict and using the class 'compare_networks0.
   
 - interpretability: Folder containing the interpretability experiments carried out.
-  - Grad-CAM.py: Applies Grad-CAM to interpret our models.
+  - **Grad-CAM.py**: Applies Grad-CAM to interpret our models.
   
 - runs: Folder containing logs of all the experiments carried out. For each experiment we saved the config file (with the hyperparameters), the final and best model state_dict and the tensorboard logs. Each state_dict weights around 50Mb, it is for this reason tht we have added them into the .gitignore file.
 
