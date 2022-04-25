@@ -37,7 +37,7 @@ _Entry points of the project in **bold font**._
   - CheXpert dataset:
     - Download LINK: https://stanfordmlgroup.github.io/competitions/chexpert/ (Requires registration)
     - Recommendation to download the _small_ version. The project will resize all the images regardless of the original resolution.
-    - The CheXpert dataset contains different kinds of pictures. For that reason, it is required to filter out all the lateral images (Only use the ones marked as 'Frontal' to be able to reproduce the same results as the original work.
+    - The CheXpert dataset contains different kinds of pictures. For that reason, it is required to filter out all the lateral images (Only use the ones marked as 'Frontal' to be able to reproduce the same results as the original work. Recommendation to generate new csv with only the images labeled as 'Frontal'.
 
 - downstream_task: Folder containing all the experiments related with the supervised training of the pre-trained models.
   - **scan_best_supervised_hyperparameters**: Scans optimal parameters for the supervised training.
