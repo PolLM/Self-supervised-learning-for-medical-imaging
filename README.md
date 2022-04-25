@@ -31,6 +31,12 @@ _Entry points of the project in **bold font**._
   - CheXpertDataset.py: Containing one class to load the CheXpert dataset
   
 - datasets: Folder where the datasets are saved. Added in .gitignore file to avoid pushing the datasets. It is not mandatory to save them on this folder (one can change the folder path on each experiment).
+  - Covid dataset:
+    - Download LINK: https://www.kaggle.com/datasets/tawsifurrahman/covid19-radiography-database
+    - 'Mask' folders must be removed manually before using it, or the mask images will be used as x-ray images and distort the results.
+  - CheXpert dataset:
+    - Download LINK: https://stanfordmlgroup.github.io/competitions/chexpert/ (Requires registration)
+    - Recommendation to download the _small_ version. The project will resize all the images regardless of the original resolution. 
 
 - downstream_task: Folder containing all the experiments related with the supervised training of the pre-trained models.
   - **scan_best_supervised_hyperparameters**: Scans optimal parameters for the supervised training.
