@@ -207,6 +207,9 @@ def freeze_model(model, str_pattern="fc."):
 def load_resnet18_with_barlow_weights(barlow_state_dict_path, num_classes = 4):
     '''
     Initialize resnet18 model and load weights from barlow twins model
+    
+    :param barlow_state_dict_path: Path of the file where the state dict is stored.
+    :param num_classes=4: Final number of classes for the FC layer.
     '''
     #Calling resnet model
     model = torchvision.models.resnet18(zero_init_residual=True)
@@ -233,6 +236,13 @@ def load_resnet18_with_barlow_weights(barlow_state_dict_path, num_classes = 4):
 
 def load_barlowmodelwithweights_supervised(dict_path, num_classes = 4):
     #Calling resnet model
+    '''
+    Initialize resnet18 model and load weights from supervised training
+    
+    :param barlow_state_dict_path: Path of the file where the state dict is stored.
+    :param num_classes=4: Final number of classes for the FC layer.
+    '''
+
     model = torchvision.models.resnet18(zero_init_residual=True)
     model.conv1 = nn.Conv2d(1, 64, 7, 2, 3, bias=False)
     model.fc = nn.Sequential( nn.Linear(512, num_classes))
