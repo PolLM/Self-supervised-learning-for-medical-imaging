@@ -49,6 +49,7 @@ _Entry points of the project in **bold font**._
   - **Grad-CAM.py**: Applies Grad-CAM to interpret our models.
   
 - runs: Folder containing logs of all the experiments carried out. For each experiment we saved the config file (with the hyperparameters), the final and best model state_dict and the tensorboard logs. Each state_dict weights around 50Mb, it is for this reason tht we have added them into the .gitignore file.
+  - The pre-trained Resnet-18 weights from the final trainings can be downloaded here: https://drive.google.com/drive/folders/1xQ-mKPM8B-XJI1DcMh4AKMwSZIMYsA1w?usp=sharing
 
 - self_sup_classes: Folder where the BarlowTwins class is defined.
   - barlow.py: Main class to implement Barlow Twins architecture.
