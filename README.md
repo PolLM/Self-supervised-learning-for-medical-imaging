@@ -40,10 +40,10 @@ _Entry points of the project in **bold font**._
     - The CheXpert dataset contains different kinds of pictures. For that reason, it is required to filter out all the lateral images (Only use the ones marked as 'Frontal' to be able to reproduce the same results as the original work. Recommendation to generate new csv with only the images labeled as 'Frontal'.
 
 - downstream_task: Folder containing all the experiments related with the supervised training of the pre-trained models.
-  - **scan_best_supervised_hyperparameters**: Scans optimal parameters for the supervised training.
+  - **scan_best_supervised_hyperparameters.py**: Scans optimal parameters for the supervised training.
   - **compare_networks.py**: Containing one class that generates two resnet models: One pretrained (Dict is provided) and one non pre-trained. Allows to train and validate both models sequentially and log into a TensorBoard writer the results of loss/accuracy.
-  - **ConfusionMatrix**: Outputs confusion matrix from model predictions.
-  - **trained_vs_no_trained_compare**: Executes multiple trainings with different number of samples given a state dict and using the class 'compare_networks0.
+  - **ConfusionMatrix.py**: Outputs confusion matrix from model predictions.
+  - **trained_vs_no_trained_compare.py**: Executes multiple trainings with different number of samples given a state dict and using the class 'compare_networks0.
   - **train_models_with_frozen_parts.py**: Executes the code to freeze and train models given a state dict. Outputs the loss/accuracy values for every epoch in terminal, and logs them into a TensorBoard writer.
   
 - interpretability: Folder containing the interpretability experiments carried out.
