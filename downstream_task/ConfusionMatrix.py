@@ -1,15 +1,11 @@
 import os
-
 import torch
-
 import torch.nn as nn
 from torchvision.transforms import transforms
 import numpy as np
-
 from PIL import Image, ImageOps, ImageFilter
 import random
 import ssl
-
 import matplotlib.pylab as plt
 
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
@@ -17,20 +13,26 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 from torch.utils.data import DataLoader
 import numpy as np
-
 import torchvision
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
 import sys
-
 from torch.utils.tensorboard import SummaryWriter
 
 
 PROJECT_PATH =  os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 sys.path.insert(0,PROJECT_PATH)
 
+
 @torch.no_grad()
 def CreateConfusionMatrix(model, dataloader_valid, config):
+    '''
+        Takes one model, executes the validation for one epoch and computes the confusion matrix for a 4 classes classification problem.
+        
+    :param model: nn.Model object to extract the confusion matrix from.
+    :param dataloader_valid: DataLoader object containing the validation dataset.
+    :param config: Configuration dictionary containing at least a 'device' type entry.
+    '''
     correct_pred = 0
     total_pred = 0
     pred_matrix = np.zeros((4,4))
@@ -74,8 +76,7 @@ config = {
 
 np.random.seed(config['random_seed'])
 
-transform = transforms.Compose([
-    
+transform = transforms.Compose([  
     transforms.Grayscale(),
     transforms.Resize(224),
     # you can add other transformations in this list
