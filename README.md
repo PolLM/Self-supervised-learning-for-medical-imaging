@@ -12,7 +12,7 @@ The description of the project, toghether with the results obtained from all the
 
 The repository is structured as follows:
 
-* *Entry points of the project in **bold font**.* *
+_Entry points of the project in **bold font**._
 
 - Project_report.pdf: Report of the project including scope and experiment results.
 
