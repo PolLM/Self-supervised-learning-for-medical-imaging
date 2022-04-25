@@ -41,12 +41,13 @@ _Entry points of the project in **bold font**._
 
 - downstream_task: Folder containing all the experiments related with the supervised training of the pre-trained models.
   - **scan_best_supervised_hyperparameters**: Scans optimal parameters for the supervised training.
-  - compare_networks.py: Containing one class that generates two resnet models: One pretrained (Dict is provided) and one non pre-trained. Allows to train and validate both models sequentially and log into a TensorFlow writer the results of loss/accuracy.
+  - compare_networks.py: Containing one class that generates two resnet models: One pretrained (Dict is provided) and one non pre-trained. Allows to train and validate both models sequentially and log into a TensorBoard writer the results of loss/accuracy.
   - **ConfusionMatrix**: Outputs confusion matrix from model predictions.
   - **trained_vs_no_trained_compare**: Executes multiple trainings with different number of samples given a state dict and using the class 'compare_networks0.
+  - **train_models_with_frozen_parts.py**: Executes the code to freeze and train models given a state dict. Outputs the loss/accuracy values for every epoch in terminal, and logs them into a TensorBoard writer.
   
 - interpretability: Folder containing the interpretability experiments carried out.
-  - **Grad-CAM.py**: Applies Grad-CAM to interpret our models.
+  - **Grad-CAM.py**: Applies Grad-CAM to interpret our models. Takes a state dict and an image as inputs.
   
 - runs: Folder containing logs of all the experiments carried out. For each experiment we saved the config file (with the hyperparameters), the final and best model state_dict and the tensorboard logs. Each state_dict weights around 50Mb, it is for this reason tht we have added them into the .gitignore file.
   - The pre-trained Resnet-18 weights from the final trainings can be downloaded here: https://drive.google.com/drive/folders/1xQ-mKPM8B-XJI1DcMh4AKMwSZIMYsA1w?usp=sharing
